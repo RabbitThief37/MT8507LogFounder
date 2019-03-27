@@ -36,6 +36,10 @@
     <StartupObject>MT8507Log.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AudioPrecision.API, Version=4.6.0.0, Culture=neutral, PublicKeyToken=756ddf07b6e97975, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -56,17 +60,27 @@
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmManufacturingAudioTest.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmManufacturingAudioTest.Designer.cs">
+      <DependentUpon>frmManufacturingAudioTest.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmSelectComPort.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmSelectComPort.Designer.cs">
       <DependentUpon>frmSelectComPort.cs</DependentUpon>
     </Compile>
+    <Compile Include="JumpItem.cs" />
     <Compile Include="LogStatus.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmManufacturingAudioTest.resx">
+      <DependentUpon>frmManufacturingAudioTest.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmSelectComPort.resx">
       <DependentUpon>frmSelectComPort.cs</DependentUpon>
@@ -92,6 +106,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="Microsoft.Office.Core">
+      <Guid>{2DF8D04C-5BFA-101B-BDE5-00AA0044DE52}</Guid>
+      <VersionMajor>2</VersionMajor>
+      <VersionMinor>8</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

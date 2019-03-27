@@ -16,7 +16,7 @@ namespace MT8507Log
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMain());
+            Application.Run(new frmManufacturingAudioTest());
         }
     }
 }
