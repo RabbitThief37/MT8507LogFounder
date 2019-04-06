@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtkLogParserTest", "MtkLogP
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProject", "TestProject", "{291FB1A2-A5B5-4764-8D9F-BD2F6CC4419F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ArduinoProject", "ArduinoProject", "{8570F4F9-F135-4627-9099-5E62F443A487}"
+	ProjectSection(SolutionItems) = preProject
+		ArduinoProject\VizioSoundbarRemote\VizioSoundbarRemote.ino = ArduinoProject\VizioSoundbarRemote\VizioSoundbarRemote.ino
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -28,7 +33,6 @@ Global
 		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|x86.ActiveCfg = Release|Any CPU
 		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|x86.Build.0 = Release|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|x86.Build.0 = Debug|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -36,7 +40,6 @@ Global
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Release|x86.ActiveCfg = Release|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Release|x86.Build.0 = Release|Any CPU
 		{C5B5786F-F69C-49DA-B797-63056F79AD6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C5B5786F-F69C-49DA-B797-63056F79AD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5B5786F-F69C-49DA-B797-63056F79AD6E}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{C5B5786F-F69C-49DA-B797-63056F79AD6E}.Debug|x86.Build.0 = Debug|Any CPU
 		{C5B5786F-F69C-49DA-B797-63056F79AD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU

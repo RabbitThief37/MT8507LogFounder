@@ -65,65 +65,65 @@ void serialEvent() {
   Send NEC remote control code to IR
   -------------------------------------- */
 void SendIR() {
-  if (inputString == "Power")
+  if (inputString == "Power")				//VIZIO_RMC_CMD_POWER
     irsend.sendNEC(0x00FF02FD, 32);
-  else if (inputString == "ResetAll")
+  else if (inputString == "ResetAll")		//VIZIO_RMC_CMD_RESET_ALL
     irsend.sendNEC(0x00FFC639, 32);
-  else if (inputString == "AUX")
+  else if (inputString == "AUX")			//VIZIO_RMC_CMD_AUX
     irsend.sendNEC(0x00FF8D72, 32);
-  else if (inputString == "Optical")
+  else if (inputString == "Optical")		//VIZIO_RMC_CMD_OPT
     irsend.sendNEC(0x00FF13EC, 32);
-  else if (inputString == "HDMI")
+  else if (inputString == "HDMI")			//VIZIO_RMC_CMD_HDMI
     irsend.sendNEC(0x00FFD52A, 32);
-  else if (inputString == "HDMIARC")
+  else if (inputString == "HDMIARC")		//VIZIO_RMC_CMD_ARC
     irsend.sendNEC(0x00FF59A6, 32);
-  else if (inputString == "BT")
+  else if (inputString == "BT")				//VIZIO_RMC_CMD_BT
     irsend.sendNEC(0x00FF44BB, 32);
-  else if (inputString == "USB")
+  else if (inputString == "USB")			//VIZIO_RMC_CMD_USB
     irsend.sendNEC(0x00FF857A, 32);
-  else if (inputString == "VolUp")
+  else if (inputString == "VolUp")			//VIZIO_RMC_CMD_VOLUME_UP
     irsend.sendNEC(0x00FF827D, 32);
-  else if (inputString == "VolDown")
+  else if (inputString == "VolDown")		//VIZIO_RMC_CMD_VOLUME_DOWN
     irsend.sendNEC(0x00FFA25D, 32);
-  else if (inputString == "LeftCursor")
+  else if (inputString == "LeftCursor")		//VIZIO_RMC_CMD_LEFT_CURSOR
     irsend.sendNEC(0x00FF51AE, 32);
-  else if (inputString == "RightCursor")
+  else if (inputString == "RightCursor")	//VIZIO_RMC_CMD_RIGHT_CURSOR
     irsend.sendNEC(0x00FFD12E, 32);
-  else if (inputString == "BassDown")
+  else if (inputString == "BassDown")		//VIZIO_RMC_CMD_BASS_DOWN
     irsend.sendNEC(0x00FF56A9, 32);
-  else if (inputString == "BassUp")
+  else if (inputString == "BassUp")			//VIZIO_RMC_CMD_BASS_UP
     irsend.sendNEC(0x00FFD629, 32);
-  else if (inputString == "TrebleDown")
+  else if (inputString == "TrebleDown")		//VIZIO_RMC_CMD_TREBLE_DOWN
     irsend.sendNEC(0x00FF16E9, 32);
-  else if (inputString == "TrebleUp")
+  else if (inputString == "TrebleUp")		//VIZIO_RMC_CMD_TREBLE_UP
     irsend.sendNEC(0x00FF9669, 32);
-  else if (inputString == "CenterDown")
+  else if (inputString == "CenterDown")		//VIZIO_RMC_CMD_CENTER_DOWN
     irsend.sendNEC(0x00FF7689, 32);
-  else if (inputString == "CenterUp")
+  else if (inputString == "CenterUp")		//VIZIO_RMC_CMD_CENTER_UP
     irsend.sendNEC(0x00FF0EF1, 32);
-  else if (inputString == "HeightDown")
+  else if (inputString == "HeightDown")		//VIZIO_RMC_CMD_HEIGHT_LEVEL_DOWN
     irsend.sendNEC(0x00FF05FA, 32);
-  else if (inputString == "HeightUp")
+  else if (inputString == "HeightUp")		//VIZIO_RMC_CMD_HEIGHT_LEVEL_UP
     irsend.sendNEC(0x00FF0DF2, 32);
-  else if (inputString == "SurroundDown")
+  else if (inputString == "SurroundDown")	//VIZIO_RMC_CMD_SURROUND_DOWN
     irsend.sendNEC(0x00FF36C9, 32);
-  else if (inputString == "SurroundUp")
+  else if (inputString == "SurroundUp")		//VIZIO_RMC_CMD_SURROUND_UP
     irsend.sendNEC(0x00FFB649, 32);
-  else if (inputString == "BalanceDown")
+  else if (inputString == "BalanceDown")	//VIZIO_RMC_CMD_BALANCE_DOWN
     irsend.sendNEC(0x00FF2DD2, 32);
-  else if (inputString == "BalanceUp")
+  else if (inputString == "BalanceUp")		//VIZIO_RMC_CMD_BALANCE_UP
     irsend.sendNEC(0x00FFCD32, 32);
-  else if (inputString == "SubDown")
+  else if (inputString == "SubDown")		//VIZIO_RMC_CMD_SUBWOOFER_DOWN
     irsend.sendNEC(0x00FF8A75, 32);
-  else if (inputString == "SubUp")
+  else if (inputString == "SubUp")			//VIZIO_RMC_CMD_SUBWOOFER_UP
     irsend.sendNEC(0x00FFB24D, 32);
-  else if (inputString == "Movie")
+  else if (inputString == "Movie")			//VIZIO_RMC_CMD_EQ_MOVIE
     irsend.sendNEC(0x00FFE619, 32);
-  else if (inputString == "Music")
+  else if (inputString == "Music")			//VIZIO_RMC_CMD_EQ_MUSIC
     irsend.sendNEC(0x00FF6699, 32);
-  else if (inputString == "Direct")
+  else if (inputString == "Direct")			//VIZIO_RMC_CMD_EQ_DIRECT
     irsend.sendNEC(0x00FF31CE, 32);
-  else if (inputString == "HeightOn")
+  else if (inputString == "HeightOn")		//VIZIO_RMC_CMD_HEIGHT_ON
     irsend.sendNEC(0x00FFA15E, 32);
   else
     {

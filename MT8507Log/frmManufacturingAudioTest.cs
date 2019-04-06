@@ -9,26 +9,18 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;
 using System.Threading;
+using System.Configuration;
+using System.IO;
 
 using AudioPrecision.API;
 
 using static MT8507Log.APxInputChannelInfo;
-using System.Configuration;
+using static MT8507Log.ArduinoRemote;
 
 namespace MT8507Log
 {
     public partial class frmManufacturingAudioTest : Form
     {
-        public enum INPUT_MODE : int
-        {
-            AUX = 0,
-            OPTICAL,
-            HDMI,
-            ARC,
-            BLUETOOTH,
-            USB
-        }
-
         public frmManufacturingAudioTest()
         {
             InitializeComponent();
@@ -117,6 +109,22 @@ namespace MT8507Log
                 this.cboInputMode.Text = string.Empty;
                 this.cboApxInputChannel.Text = string.Empty;
             }
+
+            // App.config 안에 있는 내용을 적용한다.
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["arduinoFileName"]))
+            {
+                this.txtArduinoSourceFile.Text = ConfigurationManager.AppSettings["arduinoFileName"];
+            }
+
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["apxFileName"]))
+            {
+                this.txtApxProjectFile.Text = ConfigurationManager.AppSettings["apxFileName"];
+            }
+
+            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["excelFileName"]))
+            {
+                this.txtSpecSheetFile.Text = ConfigurationManager.AppSettings["excelFileName"];
+            }
         }
 
         // 정상 종료
@@ -174,7 +182,6 @@ namespace MT8507Log
                 return;
             }
 
-
             if (this._logStatus.Start(this.cboMtkLogSerialPorts.Text) == false)
             {
                 DisplayErrorMessageBox(string.Format("{1} Port에 연결을 실패하였습니다.\n\n{0}", this.cboMtkLogSerialPorts.Text, this._logStatus.ErrorMessage));
@@ -188,15 +195,59 @@ namespace MT8507Log
             this._config.Save(ConfigurationSaveMode.Modified);
         }
 
+        // Arduino Source File 선택
+        private void BtnOpenArduinoSourceFile_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(this.txtArduinoSourceFile.Text))
+            {
+                this.openFileDialog1.InitialDirectory = Application.StartupPath;
+            }
+            else
+            {
+                this.openFileDialog1.InitialDirectory = Path.GetDirectoryName(this.txtArduinoSourceFile.Text);
+                this.openFileDialog1.FileName = Path.GetFileName(this.txtArduinoSourceFile.Text);
+            }
+
+            this.openFileDialog1.Filter = "Arduino File (*.ino)|*.ino|All files (*.*)|*.*";
+            this.openFileDialog1.FilterIndex = 1;
+
+            if (this.openFileDialog1.ShowDialog() != DialogResult.OK)
+            {
+                return;
+            }
+
+            this.txtArduinoSourceFile.Text = this.openFileDialog1.FileName;
+
+            if( this._rmc.LoadCommandFromIno(this.txtArduinoSourceFile.Text) == false )
+            {
+                this._isArduino = false;
+                DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}", Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
+                return;
+            }
+
+            this._config.AppSettings.Settings["arduinoFileName"].Value = this.txtArduinoSourceFile.Text;
+            this._config.Save(ConfigurationSaveMode.Modified);
+
+            this._isArduino = true;
+        }
+
         // APx Project 파일을 열고 준비
         private void btnOpenApxProjectFile_Click(object sender, EventArgs e)
         {
             int count = 0;
 
-            this.openFileDialog1.InitialDirectory = Application.StartupPath;
+            if( string.IsNullOrEmpty(this.txtApxProjectFile.Text) )
+            {
+                this.openFileDialog1.InitialDirectory = Application.StartupPath;
+            }
+            else
+            {
+                this.openFileDialog1.InitialDirectory = Path.GetDirectoryName(this.txtApxProjectFile.Text);
+                this.openFileDialog1.FileName = Path.GetFileName(this.txtApxProjectFile.Text);
+            }
+
             this.openFileDialog1.Filter = "All APx Projects (*.approj,*.apporojx)|*.approj*|APx Projects (*.approjx)|*.approjx|APx XML Projects (*.approj)|*.approj|All files (*.*)|*.*";
             this.openFileDialog1.FilterIndex = 1;
-            this.openFileDialog1.RestoreDirectory = true;
 
             if (this.openFileDialog1.ShowDialog() != DialogResult.OK)
             {
@@ -205,6 +256,7 @@ namespace MT8507Log
 
             this.Cursor = Cursors.WaitCursor;
             this.txtApxProjectFile.Text = this.openFileDialog1.FileName;
+
             try
             {
                 this.cboSequenceItem.Items.Clear();
@@ -249,6 +301,9 @@ namespace MT8507Log
                 return;
             }
 
+            this._config.AppSettings.Settings["apxFileName"].Value = this.txtApxProjectFile.Text;
+            this._config.Save(ConfigurationSaveMode.Modified);
+
             this._apx.Visible = true;
             this.Cursor = Cursors.Default;
 
@@ -288,9 +343,18 @@ namespace MT8507Log
         //Spec Excel 파일
         private void btnOpenSpecSheetFile_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(this.txtSpecSheetFile.Text))
+            {
+                this.openFileDialog1.InitialDirectory = Application.StartupPath;
+            }
+            else
+            {
+                this.openFileDialog1.InitialDirectory = Path.GetDirectoryName(this.txtSpecSheetFile.Text);
+                this.openFileDialog1.FileName = Path.GetFileName(this.txtSpecSheetFile.Text);
+            }
+
             this.openFileDialog1.Filter = "Excel Files (*.xls?)|*.xls?|All files (*.*)|*.*";
             this.openFileDialog1.FilterIndex = 1;
-            this.openFileDialog1.RestoreDirectory = true;
 
             if (this.openFileDialog1.ShowDialog() != DialogResult.OK)
             {
@@ -298,6 +362,7 @@ namespace MT8507Log
             }
 
             this.txtSpecSheetFile.Text = this.openFileDialog1.FileName;
+
             try
             {
                 this._excelWorkbook = this._excel.Workbooks.Open(this.txtSpecSheetFile.Text);
@@ -311,6 +376,9 @@ namespace MT8507Log
                 return;
             }
 
+            this._config.AppSettings.Settings["excelFileName"].Value = this.txtSpecSheetFile.Text;
+            this._config.Save(ConfigurationSaveMode.Modified);
+
             this.Activate();
             this._isOpenExcel = true;
         }
@@ -318,44 +386,52 @@ namespace MT8507Log
         // INPUT SOURCE 변경
         private void cboInputMode_SelectedIndexChanged(object sender, EventArgs e)
         {
-            switch( this.cboInputMode.SelectedIndex )
+            if( this._isArduino == false )
             {
-                case 0: this._currentInputMode = INPUT_MODE.AUX;        break;
-                case 1: this._currentInputMode = INPUT_MODE.OPTICAL;    break;
-                case 2: this._currentInputMode = INPUT_MODE.HDMI;       break;
-                case 3: this._currentInputMode = INPUT_MODE.ARC;        break;
-                case 4: this._currentInputMode = INPUT_MODE.BLUETOOTH;  break;
-                case 5: this._currentInputMode = INPUT_MODE.USB;        break;
+                if(string.IsNullOrEmpty(this.txtArduinoSourceFile.Text))
+                {
+                    DisplayErrorMessageBox("연결된 Arduino에 설치된 소스 파일을 선택해야만 합니다.");
+                    BtnOpenArduinoSourceFile_Click(null, null);
+                    return;
+                }
+
+                if (this._rmc.LoadCommandFromIno(this.txtArduinoSourceFile.Text) == false)
+                {
+                    this._isArduino = false;
+                    DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}", Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
+                    return;
+                }
+
+                this._isArduino = true;
+            }
+
+            switch ( this.cboInputMode.SelectedIndex )
+            {
+                case 0: this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX;  break;
+                case 1: this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_OPT;  break;
+                case 2: this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_HDMI; break;
+                case 3: this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_ARC;  break;
+                case 4: this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_BT;   break;
+                case 5: this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_USB;  break;
                 default:
                     DisplayErrorMessageBox(string.Format("알 수 없는 INPUT MODE. AUX로 강제.\n\n{0} - {1}", this.cboInputMode.SelectedIndex, this.cboInputMode.Text));
-                    this._currentInputMode = INPUT_MODE.AUX;
+                    this._currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX;
                     break;
             }
 
             RmcTxCommandInputMode(this._currentInputMode);
         }
 
-        private void RmcTxCommandInputMode(INPUT_MODE input)
+        private void RmcTxCommandInputMode(VIZIO_RMC_CMD input)
         {
-            string sendMessage = string.Empty;
             int index = 0;
             bool result = false;
-
-            switch(input)
-            {
-                case INPUT_MODE.AUX:        sendMessage = "AUX";        break;
-                case INPUT_MODE.OPTICAL:    sendMessage = "Optical";    break;
-                case INPUT_MODE.HDMI:       sendMessage = "HDMI";       break;
-                case INPUT_MODE.ARC:        sendMessage = "HDMIARC";    break;
-                case INPUT_MODE.BLUETOOTH:  sendMessage = "BT";         break;
-                case INPUT_MODE.USB:        sendMessage = "USB";        break;
-            }
 
             for(int retryCount = 0; retryCount < MTK_LOG_RETRY_COUNT; retryCount++)
             {
                 this._logStatus.ResetNewData();
 
-                if (this._rmc.SendCommand(sendMessage) == false)
+                if (this._rmc.SendCommand(input) == false)
                     return;
 
                 do
@@ -369,27 +445,27 @@ namespace MT8507Log
 
                     switch (input)
                     {
-                        case INPUT_MODE.AUX:
+                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX:
                             if (this._logStatus.INPUT_SOURCE.Equals("AUX"))
                                 result = true;
                             break;
-                        case INPUT_MODE.OPTICAL:
+                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_OPT:
                             if (this._logStatus.INPUT_SOURCE.Equals("OPTICAL"))
                                 result = true;
                             break;
-                        case INPUT_MODE.HDMI:
+                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_HDMI:
                             if (this._logStatus.INPUT_SOURCE.Equals("HDMI"))
                                 result = true;
                             break;
-                        case INPUT_MODE.ARC:
+                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_ARC:
                             if (this._logStatus.INPUT_SOURCE.Equals("ARC"))
                                 result = true;
                             break;
-                        case INPUT_MODE.BLUETOOTH:
+                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_BT:
                             if (this._logStatus.INPUT_SOURCE.Equals("BLUETOOTH"))
                                 result = true;
                             break;
-                        case INPUT_MODE.USB:
+                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_USB:
                             if (this._logStatus.INPUT_SOURCE.Equals("USB"))
                                 result = true;
                             break;
@@ -459,8 +535,9 @@ namespace MT8507Log
 
         private bool _isOpenApx = false;
         private bool _isOpenExcel = false;
+        private bool _isArduino = false;
 
-        private INPUT_MODE _currentInputMode = INPUT_MODE.AUX;
+        private VIZIO_RMC_CMD _currentInputMode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX;
         private APxInputChannelInfo _apxInputChannel;
 
     }

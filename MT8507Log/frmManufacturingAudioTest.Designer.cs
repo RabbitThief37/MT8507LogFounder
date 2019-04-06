@@ -52,6 +52,9 @@
             this.txtMeasurement = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
             this.rtxtOperating = new System.Windows.Forms.RichTextBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.btnOpenArduinoSourceFile = new System.Windows.Forms.Button();
+            this.txtArduinoSourceFile = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // label1
@@ -111,7 +114,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(351, 17);
+            this.label3.Location = new System.Drawing.Point(351, 43);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(136, 16);
             this.label3.TabIndex = 0;
@@ -120,7 +123,7 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(351, 46);
+            this.label4.Location = new System.Drawing.Point(351, 72);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(136, 16);
             this.label4.TabIndex = 0;
@@ -128,7 +131,7 @@
             // 
             // txtApxProjectFile
             // 
-            this.txtApxProjectFile.Location = new System.Drawing.Point(493, 11);
+            this.txtApxProjectFile.Location = new System.Drawing.Point(493, 37);
             this.txtApxProjectFile.Name = "txtApxProjectFile";
             this.txtApxProjectFile.ReadOnly = true;
             this.txtApxProjectFile.Size = new System.Drawing.Size(635, 26);
@@ -137,7 +140,7 @@
             // 
             // txtSpecSheetFile
             // 
-            this.txtSpecSheetFile.Location = new System.Drawing.Point(493, 40);
+            this.txtSpecSheetFile.Location = new System.Drawing.Point(493, 66);
             this.txtSpecSheetFile.Name = "txtSpecSheetFile";
             this.txtSpecSheetFile.ReadOnly = true;
             this.txtSpecSheetFile.Size = new System.Drawing.Size(635, 26);
@@ -146,7 +149,7 @@
             // 
             // btnOpenApxProjectFile
             // 
-            this.btnOpenApxProjectFile.Location = new System.Drawing.Point(1126, 10);
+            this.btnOpenApxProjectFile.Location = new System.Drawing.Point(1126, 36);
             this.btnOpenApxProjectFile.Name = "btnOpenApxProjectFile";
             this.btnOpenApxProjectFile.Size = new System.Drawing.Size(44, 28);
             this.btnOpenApxProjectFile.TabIndex = 2;
@@ -156,7 +159,7 @@
             // 
             // btnOpenSpecSheetFile
             // 
-            this.btnOpenSpecSheetFile.Location = new System.Drawing.Point(1126, 39);
+            this.btnOpenSpecSheetFile.Location = new System.Drawing.Point(1126, 65);
             this.btnOpenSpecSheetFile.Name = "btnOpenSpecSheetFile";
             this.btnOpenSpecSheetFile.Size = new System.Drawing.Size(44, 28);
             this.btnOpenSpecSheetFile.TabIndex = 4;
@@ -167,7 +170,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(399, 72);
+            this.label5.Location = new System.Drawing.Point(399, 98);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(88, 16);
             this.label5.TabIndex = 0;
@@ -183,7 +186,7 @@
             "HDMI ARC",
             "BLUETOOTH",
             "USB"});
-            this.cboInputMode.Location = new System.Drawing.Point(494, 69);
+            this.cboInputMode.Location = new System.Drawing.Point(494, 95);
             this.cboInputMode.Name = "cboInputMode";
             this.cboInputMode.Size = new System.Drawing.Size(145, 24);
             this.cboInputMode.TabIndex = 1;
@@ -192,7 +195,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(657, 72);
+            this.label6.Location = new System.Drawing.Point(657, 98);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(152, 16);
             this.label6.TabIndex = 0;
@@ -206,9 +209,9 @@
             "FL,FR,Ctr,FTL,FTR,Sub 6ch (3.1.2)",
             "FL,FR,Ctr,FTL,FTR,SL,SR,Sub 8ch (5.1.2)",
             "FL,Ctr,FTL,SL,SR,RTL,Sub 7ch (5.1.4)"});
-            this.cboApxInputChannel.Location = new System.Drawing.Point(815, 69);
+            this.cboApxInputChannel.Location = new System.Drawing.Point(806, 95);
             this.cboApxInputChannel.Name = "cboApxInputChannel";
-            this.cboApxInputChannel.Size = new System.Drawing.Size(351, 24);
+            this.cboApxInputChannel.Size = new System.Drawing.Size(364, 24);
             this.cboApxInputChannel.TabIndex = 1;
             this.cboApxInputChannel.SelectedIndexChanged += new System.EventHandler(this.cboApxInputChannel_SelectedIndexChanged);
             // 
@@ -219,7 +222,7 @@
             // cboSequenceItem
             // 
             this.cboSequenceItem.FormattingEnabled = true;
-            this.cboSequenceItem.Location = new System.Drawing.Point(16, 126);
+            this.cboSequenceItem.Location = new System.Drawing.Point(16, 144);
             this.cboSequenceItem.Name = "cboSequenceItem";
             this.cboSequenceItem.Size = new System.Drawing.Size(532, 24);
             this.cboSequenceItem.TabIndex = 5;
@@ -227,7 +230,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(13, 107);
+            this.label7.Location = new System.Drawing.Point(13, 125);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(224, 16);
             this.label7.TabIndex = 0;
@@ -236,7 +239,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(13, 169);
+            this.label8.Location = new System.Drawing.Point(13, 187);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(112, 16);
             this.label8.TabIndex = 0;
@@ -244,7 +247,7 @@
             // 
             // txtSequenceStep
             // 
-            this.txtSequenceStep.Location = new System.Drawing.Point(127, 163);
+            this.txtSequenceStep.Location = new System.Drawing.Point(127, 181);
             this.txtSequenceStep.Name = "txtSequenceStep";
             this.txtSequenceStep.ReadOnly = true;
             this.txtSequenceStep.Size = new System.Drawing.Size(100, 26);
@@ -253,7 +256,7 @@
             // 
             // txtMeasurement
             // 
-            this.txtMeasurement.Location = new System.Drawing.Point(233, 163);
+            this.txtMeasurement.Location = new System.Drawing.Point(233, 181);
             this.txtMeasurement.Name = "txtMeasurement";
             this.txtMeasurement.ReadOnly = true;
             this.txtMeasurement.Size = new System.Drawing.Size(315, 26);
@@ -262,7 +265,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(552, 107);
+            this.label9.Location = new System.Drawing.Point(552, 125);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(184, 16);
             this.label9.TabIndex = 0;
@@ -271,11 +274,39 @@
             // rtxtOperating
             // 
             this.rtxtOperating.Enabled = false;
-            this.rtxtOperating.Location = new System.Drawing.Point(555, 127);
+            this.rtxtOperating.Location = new System.Drawing.Point(555, 145);
             this.rtxtOperating.Name = "rtxtOperating";
             this.rtxtOperating.Size = new System.Drawing.Size(611, 144);
             this.rtxtOperating.TabIndex = 6;
             this.rtxtOperating.Text = "";
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Location = new System.Drawing.Point(351, 14);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(136, 16);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Arduino Src File";
+            // 
+            // btnOpenArduinoSourceFile
+            // 
+            this.btnOpenArduinoSourceFile.Location = new System.Drawing.Point(1126, 7);
+            this.btnOpenArduinoSourceFile.Name = "btnOpenArduinoSourceFile";
+            this.btnOpenArduinoSourceFile.Size = new System.Drawing.Size(44, 28);
+            this.btnOpenArduinoSourceFile.TabIndex = 2;
+            this.btnOpenArduinoSourceFile.Text = "...";
+            this.btnOpenArduinoSourceFile.UseVisualStyleBackColor = true;
+            this.btnOpenArduinoSourceFile.Click += new System.EventHandler(this.BtnOpenArduinoSourceFile_Click);
+            // 
+            // txtArduinoSourceFile
+            // 
+            this.txtArduinoSourceFile.Location = new System.Drawing.Point(493, 8);
+            this.txtArduinoSourceFile.Name = "txtArduinoSourceFile";
+            this.txtArduinoSourceFile.ReadOnly = true;
+            this.txtArduinoSourceFile.Size = new System.Drawing.Size(635, 26);
+            this.txtArduinoSourceFile.TabIndex = 3;
+            this.txtArduinoSourceFile.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
             // frmManufacturingAudioTest
             // 
@@ -288,8 +319,10 @@
             this.Controls.Add(this.txtSpecSheetFile);
             this.Controls.Add(this.txtMeasurement);
             this.Controls.Add(this.txtSequenceStep);
+            this.Controls.Add(this.txtArduinoSourceFile);
             this.Controls.Add(this.txtApxProjectFile);
             this.Controls.Add(this.btnConnectMtkSerialPort);
+            this.Controls.Add(this.btnOpenArduinoSourceFile);
             this.Controls.Add(this.btnOpenApxProjectFile);
             this.Controls.Add(this.btnConnectRmcTxSerialPort);
             this.Controls.Add(this.cboApxInputChannel);
@@ -302,6 +335,7 @@
             this.Controls.Add(this.label8);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label6);
+            this.Controls.Add(this.label10);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label1);
@@ -343,5 +377,8 @@
         private System.Windows.Forms.TextBox txtMeasurement;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.RichTextBox rtxtOperating;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Button btnOpenArduinoSourceFile;
+        private System.Windows.Forms.TextBox txtArduinoSourceFile;
     }
 }
