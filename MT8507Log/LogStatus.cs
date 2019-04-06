@@ -10,21 +10,31 @@ namespace MT8507Log
 {
     public class LogStatus : IDisposable
     {
-        public LogStatus(string portName)
+        public LogStatus()
         {
-            this._portName = portName;
             this._receiveQueue = new ConcurrentQueue<byte[]>();
-            this._serialClient = new SerialClient(this._portName, this._receiveQueue);
+            this._serialClient = new SerialClient(this._receiveQueue);
             this._processQueue = new ConcurrentQueue<string>();
+
+            this._processPortDataThread = new Thread(new ThreadStart(this.ProcessPortDataInQueue))
+            {
+                Priority = ThreadPriority.Normal
+            };
+            this._processPortDataThread.Name = "ProcessQueue" + this._processPortDataThread.ManagedThreadId.ToString();
+
+            this._processStringThread = new Thread(new ThreadStart(ProcessStringInQueue))
+            {
+                Priority = ThreadPriority.Normal
+            };
+            this._processStringThread.Name = "ProcessQueue" + this._processStringThread.ManagedThreadId.ToString();
         }
 
         public void Dispose()
         {
-            this._processContinue = false;
-            this._serialClient.CloseConn();
-            this._serialClient.Dispose();
-
+            Close();
             Thread.Sleep(10);
+
+            this._serialClient.Dispose();
 
             if (this._processPortDataThread.ThreadState != ThreadState.Stopped)
             {
@@ -37,30 +47,32 @@ namespace MT8507Log
             }
         }
 
-        public bool Start()
+        public bool Start(string portName = "")
         {
-            if (!this._serialClient.OpenConn())
+            if( portName.Length >= 0 )
+                this._portName = portName;
+
+            if (!this._serialClient.OpenConn(this._portName))
             {
                 this.ErrorMessage = this._serialClient.ErrorMessage;
+                this.IsOpen = false;
                 return false;
             }
 
             this._processContinue = true;
-            this._processPortDataThread = new Thread(new ThreadStart(this.ProcessPortDataInQueue))
-            {
-                Priority = ThreadPriority.Normal
-            };
-            this._processPortDataThread.Name = "ProcessQueue" + this._processPortDataThread.ManagedThreadId.ToString();
-            this._processPortDataThread.Start();
 
-            this._processStringThread = new Thread(new ThreadStart(ProcessStringInQueue))
-            {
-                Priority = ThreadPriority.Normal
-            };
-            this._processStringThread.Name = "ProcessQueue" + this._processStringThread.ManagedThreadId.ToString();
+            this._processPortDataThread.Start();
             this._processStringThread.Start();
 
+            this.IsOpen = true;
             return true;
+        }
+
+        public void Close()
+        {
+            this._processContinue = false;
+            this._serialClient.CloseConn();
+            this.IsOpen = false;
         }
 
         //---------------------------------//
@@ -333,7 +345,7 @@ namespace MT8507Log
 
                                 case 14:
                                     {
-                                        switch( valueArg )
+                                        switch (valueArg)
                                         {
                                             case 18: this.MODEL_NAME = "SB46514-F6"; break;
                                             case 19: this.MODEL_NAME = "SB46312-F6"; break;
@@ -379,7 +391,7 @@ namespace MT8507Log
                             bracePos = argList.IndexOf("{", bracePos + 1);
                             index++;
 
-                        } while (  bracePos != -1);
+                        } while (bracePos != -1);
                     }
                     break;
 
@@ -391,7 +403,7 @@ namespace MT8507Log
 
         public bool IsNewData()
         {
-            if( this.changeData )
+            if (this.changeData)
             {
                 this.changeData = false;
                 return true;
@@ -400,12 +412,16 @@ namespace MT8507Log
             return false;
         }
 
-        private void setNewData() {  this.changeData = true;  }
+        public void ResetNewData() { this.changeData = false; }
+
+        private void setNewData() { this.changeData = true; }
 
         public const string COMMAND_PREFIX = "<misc_uart_mcu_execute_send_cmd>";
         public const string COMMAND_ID = "UART_MCU_COMMAND_ID:{";
         public const string COMMAND_DATA = "},Data{";
         public const string COMMAND_DATA_FIRST = "},0{";
+
+        public bool IsOpen { get; private set; } = false;
 
         public string ErrorMessage { get; private set; }
 

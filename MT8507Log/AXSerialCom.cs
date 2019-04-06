@@ -26,9 +26,8 @@ namespace MT8507Log
         /*The Critical Frequency of Communication to Avoid Any Lag*/
         private const int freqCriticalLimit = 20;
 
-        public SerialClient(string port, ConcurrentQueue<byte[]> queue)
+        public SerialClient(ConcurrentQueue<byte[]> queue)
         {
-            this._port = port;
             this._baudRate = 921600;
             this._queue = queue;
 
@@ -60,8 +59,11 @@ namespace MT8507Log
             get { return this.errorMessage; }
         }
 
-        public bool OpenConn()
+        public bool OpenConn(string port = "")
         {
+            if( port.Length > 0 )
+                this._port = port;
+
             try
             {
                 if (_serialPort == null)
