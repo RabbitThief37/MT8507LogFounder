@@ -6,11 +6,11 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MT8507Log
+namespace ZTCK.MeasurementHelper
 {
-    public class LogStatus : IDisposable
+    public class MtkLogStatus : IDisposable
     {
-        public LogStatus()
+        public MtkLogStatus()
         {
             this._receiveQueue = new ConcurrentQueue<byte[]>();
             this._serialClient = new SerialClient(this._receiveQueue);
@@ -49,7 +49,7 @@ namespace MT8507Log
 
         public bool Start(string portName = "")
         {
-            if( portName.Length >= 0 )
+            if (portName.Length >= 0)
                 this._portName = portName;
 
             if (!this._serialClient.OpenConn(this._portName))

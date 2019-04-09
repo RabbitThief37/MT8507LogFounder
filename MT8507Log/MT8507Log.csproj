@@ -55,8 +55,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APxInputChannelInfo.cs" />
-    <Compile Include="ArduinoRemote.cs" />
-    <Compile Include="AXSerialCom.cs" />
     <Compile Include="frmManufacturingAudioTest.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -64,7 +62,6 @@
       <DependentUpon>frmManufacturingAudioTest.cs</DependentUpon>
     </Compile>
     <Compile Include="JumpItem.cs" />
-    <Compile Include="LogStatus.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="frmManufacturingAudioTest.resx">
@@ -102,6 +99,12 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\APMeasurementHelper\APMeasurementHelper.csproj">
+      <Project>{9927a506-3ca1-4587-a1b4-27a2d8a3cb2e}</Project>
+      <Name>APMeasurementHelper</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

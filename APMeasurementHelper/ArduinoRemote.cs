@@ -7,10 +7,10 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MT8507Log
+namespace ZTCK.Lib.APMeasurementHelper
 {
     public class ArduinoRemote : IDisposable
-    { 
+    {
         public enum VIZIO_RMC_CMD : int
         {
             VIZIO_RMC_CMD_POWER = 0,
@@ -213,6 +213,42 @@ namespace MT8507Log
             }
 
             return result;
+        }
+
+        public void LoadCommandDefault()
+        {
+            this._cmd.Clear();
+
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER, "Power");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX, "AUX");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_OPT, "Optical");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HDMI, "HDMI");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_ARC, "HDMIARC");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BT, "BT");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_USB, "USB");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_RESET_ALL, "ResetAll");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VOLUME_UP, "VolUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VOLUME_DOWN, "VolDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_LEFT_CURSOR, "LeftCursor");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_RIGHT_CURSOR, "RightCursor");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BASS_UP, "BassUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BASS_DOWN, "BassDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_TREBLE_UP, "TrebleUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_TREBLE_DOWN, "TrebleDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_CENTER_UP, "CenterUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_CENTER_DOWN, "CenterDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HEIGHT_LEVEL_UP, "HeightUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HEIGHT_LEVEL_DOWN, "HeightDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SURROUND_UP, "SurroundUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SURROUND_DOWN, "SurroundDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BALANCE_UP, "BalanceUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BALANCE_DOWN, "BalanceDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SUBWOOFER_UP, "SubUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SUBWOOFER_DOWN, "SubDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_EQ_MOVIE, "Movie");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_EQ_MUSIC, "Music");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_EQ_DIRECT, "Direct");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HEIGHT_ON, "HeightOn");
         }
 
         public const string ARDUINO_SEND_IR = "SendIR() {";

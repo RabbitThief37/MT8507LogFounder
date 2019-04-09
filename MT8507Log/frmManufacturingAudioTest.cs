@@ -13,9 +13,10 @@ using System.Configuration;
 using System.IO;
 
 using AudioPrecision.API;
+using ZTCK.Lib.APMeasurementHelper;
 
 using static MT8507Log.APxInputChannelInfo;
-using static MT8507Log.ArduinoRemote;
+using static ZTCK.Lib.APMeasurementHelper.ArduinoRemote;
 
 namespace MT8507Log
 {
@@ -40,7 +41,7 @@ namespace MT8507Log
             try
             {
                 this._rmc = new ArduinoRemote();
-                this._logStatus = new LogStatus();
+                this._logStatus = new MtkLogStatus();
 
                 this._config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 
@@ -388,21 +389,7 @@ namespace MT8507Log
         {
             if( this._isArduino == false )
             {
-                if(string.IsNullOrEmpty(this.txtArduinoSourceFile.Text))
-                {
-                    DisplayErrorMessageBox("연결된 Arduino에 설치된 소스 파일을 선택해야만 합니다.");
-                    BtnOpenArduinoSourceFile_Click(null, null);
-                    return;
-                }
-
-                if (this._rmc.LoadCommandFromIno(this.txtArduinoSourceFile.Text) == false)
-                {
-                    this._isArduino = false;
-                    DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}", Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
-                    return;
-                }
-
-                this._isArduino = true;
+                SelectArduinoCommandSet();
             }
 
             switch ( this.cboInputMode.SelectedIndex )
@@ -419,69 +406,49 @@ namespace MT8507Log
                     break;
             }
 
-            RmcTxCommandInputMode(this._currentInputMode);
+            // Arduino를 통해서 IR 명령을 전송
+            if (this._rmc.SendCommand(this._currentInputMode) == false)
+            {
+                DisplayErrorMessageBox(string.Format("Arduino를 통한 {0} 전송에 실패했습니다.\n\n{1}", this._currentInputMode.ToString(), this._rmc.ErrorMessage));
+                cboApxInputChannel.Text = string.Empty;
+                return;
+            }
+
+            // MTK Log를 계속적으로 확인해서 변경될 때까지 
+            if( this._logStatus.CheckMtkStatus(this._currentInputMode) == false )
+            {
+                DisplayErrorMessageBox(string.Format("MTK LOG에서 {0} 변경이 없습니다.\n\n{1}", this._currentInputMode.ToString(), this._logStatus.ErrorMessage));
+                cboApxInputChannel.Text = string.Empty;
+                return;
+            }
         }
 
-        private void RmcTxCommandInputMode(VIZIO_RMC_CMD input)
+        private void SelectArduinoCommandSet()
         {
-            int index = 0;
-            bool result = false;
-
-            for(int retryCount = 0; retryCount < MTK_LOG_RETRY_COUNT; retryCount++)
+            if (string.IsNullOrEmpty(this.txtArduinoSourceFile.Text))
             {
-                this._logStatus.ResetNewData();
+                DialogResult result = MessageBox.Show(this, "Arduino Source Code가 지정되지 않았습니다.\n\n파일을 선택하시겠습니까?\n\n(YES - 파일 선택 , NO - 기본 명령어)"
+                                                     , "SELECTION", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
-                if (this._rmc.SendCommand(input) == false)
-                    return;
-
-                do
+                if( result == DialogResult.Yes)
                 {
-                    if (this._logStatus.IsNewData() == false)
+                    BtnOpenArduinoSourceFile_Click(null, null);
+
+                    if (this._rmc.LoadCommandFromIno(this.txtArduinoSourceFile.Text) == false)
                     {
-                        index++;
-                        Thread.Sleep(RMC_COMMAND_WAIT_TIME_MS); // rmc 명령을 보고 mtk log 처리될때까지 잠시
-                        continue;
+                        DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}\n\n기본 명령어로 설정합니다."
+                                              , Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
+
+                        this._rmc.LoadCommandDefault();
                     }
-
-                    switch (input)
-                    {
-                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX:
-                            if (this._logStatus.INPUT_SOURCE.Equals("AUX"))
-                                result = true;
-                            break;
-                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_OPT:
-                            if (this._logStatus.INPUT_SOURCE.Equals("OPTICAL"))
-                                result = true;
-                            break;
-                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_HDMI:
-                            if (this._logStatus.INPUT_SOURCE.Equals("HDMI"))
-                                result = true;
-                            break;
-                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_ARC:
-                            if (this._logStatus.INPUT_SOURCE.Equals("ARC"))
-                                result = true;
-                            break;
-                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_BT:
-                            if (this._logStatus.INPUT_SOURCE.Equals("BLUETOOTH"))
-                                result = true;
-                            break;
-                        case VIZIO_RMC_CMD.VIZIO_RMC_CMD_USB:
-                            if (this._logStatus.INPUT_SOURCE.Equals("USB"))
-                                result = true;
-                            break;
-                    }
-                    break;
-
-                } while (index < MTK_LOG_CONFIRM_COUNT);
-
-                if (result)
-                    break;
+                }
+                else
+                {
+                    this._rmc.LoadCommandDefault();
+                }
             }
 
-            if( result == false )
-            {
-                DisplayErrorMessageBox("RMC 정보가 전송 안되거나.\n\nMTK LOG가 정상적이지 않습니다.\n\nKS에게 문의해 주세요.");
-            }
+            this._isArduino = true;
         }
 
         private void cboApxInputChannel_SelectedIndexChanged(object sender, EventArgs e)
@@ -519,13 +486,9 @@ namespace MT8507Log
             }
         }
 
-        public const int MTK_LOG_CONFIRM_COUNT = 20;
-        public const int MTK_LOG_RETRY_COUNT = 3;
-        public const int RMC_COMMAND_WAIT_TIME_MS = 100;
-
         private Configuration _config;
 
-        public LogStatus _logStatus = null;
+        public MtkLogStatus _logStatus = null;
         public ArduinoRemote _rmc = null;
         public APx500 _apx = null;
 

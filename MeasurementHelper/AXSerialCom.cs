@@ -4,7 +4,7 @@ using System.Threading;
 using Diagnostics = System.Diagnostics;
 using System.Collections.Concurrent;
 
-namespace MT8507Log
+namespace ZTCK.MeasurementHelper
 {
     //-------------------------------------------------------------------
     //This AX-Fast Serial Library
