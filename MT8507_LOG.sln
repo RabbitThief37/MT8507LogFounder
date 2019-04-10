@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MT8507Log", "MT8507Log\MT8507Log.csproj", "{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9927A506-3CA1-4587-A1B4-27A2D8A3CB2E} = {9927A506-3CA1-4587-A1B4-27A2D8A3CB2E}
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArduinoRemoteTester", "ArduinoRemoteTester\ArduinoRemoteTester.csproj", "{DB9D259D-C0D0-477B-BC87-BBD84716A10F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MtkLogParserTest", "MtkLogParserTest\MtkLogParserTest.csproj", "{C5B5786F-F69C-49DA-B797-63056F79AD6E}"
@@ -21,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ArduinoProject", "ArduinoPr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APMeasurementHelper", "APMeasurementHelper\APMeasurementHelper.csproj", "{9927A506-3CA1-4587-A1B4-27A2D8A3CB2E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APxMeasurementController", "MT8507Log\APxMeasurementController.csproj", "{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,14 +26,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|x86.Build.0 = Debug|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|x86.ActiveCfg = Release|Any CPU
-		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|x86.Build.0 = Release|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{DB9D259D-C0D0-477B-BC87-BBD84716A10F}.Debug|x86.Build.0 = Debug|Any CPU
@@ -59,6 +48,14 @@ Global
 		{9927A506-3CA1-4587-A1B4-27A2D8A3CB2E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9927A506-3CA1-4587-A1B4-27A2D8A3CB2E}.Release|x86.ActiveCfg = Release|Any CPU
 		{9927A506-3CA1-4587-A1B4-27A2D8A3CB2E}.Release|x86.Build.0 = Release|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Debug|x86.Build.0 = Debug|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|x86.ActiveCfg = Release|Any CPU
+		{FD1B6CE6-DAEA-4625-BAAF-7CF4324C94D9}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

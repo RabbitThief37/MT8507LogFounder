@@ -1,0 +1,83 @@
+M	L	R
+
+0	0	F
+1	8	7
+2	4	B
+3	C	3
+4	2	D
+5	A	5
+6	6	9
+7	E	1
+8	1	E
+9	9	6
+A	5	A
+B	D	2
+C	3	C	
+D	B	4
+E	7	8
+F	F	0
+
+Power		0x40 	02FD 
+
+ResetAll		0x63	C639
+
+ResetAudio	0x80	01FE
+
+AUX 		0xB1  	8D72 
+
+Optical		0xC8  	13EC 
+
+HDMI 		0xAB	D52A 
+
+HDMIARC		0x9A	59A6 
+
+BT		0x22	44BB 
+
+USB		0xA1	857A
+
+VolUp		0x41	827D
+
+VolDown		0x45	A25D
+
+LeftCursor		0x8A	51AE
+
+RightCursor	0x8B	D12E
+
+BassDown		0x6A	56A9
+
+BassUp		0x6B	D629
+
+TrebleDown	0x68	16E9
+
+TrebleUp		0x69	9669
+
+CenterDown	0x6E	7689
+
+CenterUp		0x70	0EF1
+
+HeightDown	0xA0	05FA
+
+HeightUp		0xB0	0DF2
+
+SurroundDown	0x6C	36C9
+
+SurroundUp	0x6D	B649
+
+BalanceDown	0xB4	2DD2
+
+BalanceUp	0xB3	CD32
+
+SubDown		0x51	8A75
+
+SubUp		0x4D	B24D
+
+Movie		0x67	E619
+
+Music		0x66	6699
+
+Direct		0x8C	31CE
+
+HeightOn		0x85	A15E
+
+
+
