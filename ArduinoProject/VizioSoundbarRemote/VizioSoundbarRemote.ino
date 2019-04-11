@@ -69,8 +69,12 @@ void SendIR() {
     irsend.sendNEC(0x00FF02FD, 32);
   else if (inputString == "ResetAll")		//VIZIO_RMC_CMD_RESET_ALL
     irsend.sendNEC(0x00FFC639, 32);
+  else if (inputString == "ResetAudio")		//VIZIO_RMC_CMD_RESET_AUDIO
+    irsend.sendNEC(0x00FF01FE, 32);
   else if (inputString == "AUX")			//VIZIO_RMC_CMD_AUX
     irsend.sendNEC(0x00FF8D72, 32);
+  else if (inputString == "Coxial")			//VIZIO_RMC_CMD_COXIAL
+    irsend.sendNEC(0x00FF936C, 32);
   else if (inputString == "Optical")		//VIZIO_RMC_CMD_OPT
     irsend.sendNEC(0x00FF13EC, 32);
   else if (inputString == "HDMI")			//VIZIO_RMC_CMD_HDMI
@@ -125,6 +129,54 @@ void SendIR() {
     irsend.sendNEC(0x00FF31CE, 32);
   else if (inputString == "HeightOn")		//VIZIO_RMC_CMD_HEIGHT_ON
     irsend.sendNEC(0x00FFA15E, 32);
+  else if (inputString == "HeightOff")		//VIZIO_RMC_CMD_HEIGHT_OFF
+    irsend.sendNEC(0x00FFC53A, 32);
+  else if (inputString == "HeightVrt")		//VIZIO_RMC_CMD_HEIGHT_VRT
+    irsend.sendNEC(0x00FFB14E, 32);
+  else if (inputString == "Mute")			//VIZIO_RMC_CMD_MUTE
+    irsend.sendNEC(0x00FF12ED, 32);
+  else if (inputString == "BTPair")			//VIZIO_RMC_CMD_BT_PAIR
+    irsend.sendNEC(0x00FFF609, 32);
+  else if (inputString == "SurroundOn")		//VIZIO_RMC_CMD_SURROUND_ON
+    irsend.sendNEC(0x00FFC43B, 32);
+  else if (inputString == "SurroundOff")	//VIZIO_RMC_CMD_SURROUND_OFF
+    irsend.sendNEC(0x00FF24DB, 32);
+  else if (inputString == "VolLvOn")		//VIZIO_RMC_CMD_VOLUME_LEVELER_ON
+    irsend.sendNEC(0x00FF14EB, 32);
+  else if (inputString == "VolLvOff")		//VIZIO_RMC_CMD_VOLUME_LEVELER_OFF
+    irsend.sendNEC(0x00FF42BD, 32);
+  else if (inputString == "Info")			//VIZIO_RMC_CMD_INFO
+    irsend.sendNEC(0x00FFD827, 32);
+  else if (inputString == "NightOn")		//VIZIO_RMC_CMD_NIGHT_ON
+    irsend.sendNEC(0x00FF8679, 32);
+  else if (inputString == "NightOff")		//VIZIO_RMC_CMD_NIGHT_OFF
+    irsend.sendNEC(0x00FF46B9, 32);
+  else if (inputString == "DelayUp")		//VIZIO_RMC_CMD_AV_DELAY_UP
+    irsend.sendNEC(0x00FF6B94, 32);
+  else if (inputString == "DelayDown")		//VIZIO_RMC_CMD_AV_DELAY_DOWN
+    irsend.sendNEC(0x00FF8E71, 32);
+  else if (inputString == "SpkTest")		//VIZIO_RMC_CMD_SPEAKER_TEST
+    irsend.sendNEC(0x00FF35CA, 32);
+  else if (inputString == "VztvrmtOn")		//VIZIO_RMC_CMD_VZTVRMT_ON
+    irsend.sendNEC(0x00FF7887, 32);
+  else if (inputString == "VztvrmtOff")		//VIZIO_RMC_CMD_VZTVRMT_OFF
+    irsend.sendNEC(0x00FFF807, 32);
+  else if (inputString == "EcoOn")			//VIZIO_RMC_CMD_ECO_ON
+    irsend.sendNEC(0x00FF649B, 32);
+  else if (inputString == "EcoOff")			//VIZIO_RMC_CMD_ECO_OFF
+    irsend.sendNEC(0x00FFE41B, 32);
+  else if (inputString == "PwrLedOn")		//VIZIO_RMC_CMD_POWER_LED_ON
+    irsend.sendNEC(0x00FF04FB, 32);
+  else if (inputString == "PwrLedOff")		//VIZIO_RMC_CMD_POWER_LED_OFF
+    irsend.sendNEC(0x00FF847B, 32);
+  else if (inputString == "LearnVolUp")		//VIZIO_RMC_CMD_LEARN_VOLUME_UP
+    irsend.sendNEC(0x00FFEE11, 32);
+  else if (inputString == "LearnVolDown")	//VIZIO_RMC_CMD_LEARN_VOLUME_DOWN
+    irsend.sendNEC(0x00FF906F, 32);
+  else if (inputString == "LearnMute")		//VIZIO_RMC_CMD_LEARN_MUTE
+    irsend.sendNEC(0x00FF4EB1, 32);
+  else if (inputString == "WifiSetup")		//VIZIO_RMC_CMD_WIFI_SETUP
+    irsend.sendNEC(0x00FFE11E, 32);
   else
     {
       lcd.setCursor(0, 1);

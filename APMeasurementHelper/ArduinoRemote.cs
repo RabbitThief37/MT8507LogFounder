@@ -47,6 +47,28 @@ namespace ZTCK.Lib.APMeasurementHelper
             VIZIO_RMC_CMD_HEIGHT_ON,
             VIZIO_RMC_CMD_HEIGHT_OFF,
             VIZIO_RMC_CMD_HEIGHT_VRT,
+            VIZIO_RMC_CMD_MUTE,
+            VIZIO_RMC_CMD_BT_PAIR,
+            VIZIO_RMC_CMD_SURROUND_ON,
+            VIZIO_RMC_CMD_SURROUND_OFF,
+            VIZIO_RMC_CMD_VOLUME_LEVELER_ON,
+            VIZIO_RMC_CMD_VOLUME_LEVELER_OFF,
+            VIZIO_RMC_CMD_INFO,
+            VIZIO_RMC_CMD_NIGHT_ON,
+            VIZIO_RMC_CMD_NIGHT_OFF,
+            VIZIO_RMC_CMD_AV_DELAY_UP,
+            VIZIO_RMC_CMD_AV_DELAY_DOWN,
+            VIZIO_RMC_CMD_SPEAKER_TEST,
+            VIZIO_RMC_CMD_VZTVRMT_ON,
+            VIZIO_RMC_CMD_VZTVRMT_OFF,
+            VIZIO_RMC_CMD_ECO_ON,
+            VIZIO_RMC_CMD_ECO_OFF,
+            VIZIO_RMC_CMD_POWER_LED_ON,
+            VIZIO_RMC_CMD_POWER_LED_OFF,
+            VIZIO_RMC_CMD_LEARN_VOLUME_UP,
+            VIZIO_RMC_CMD_LEARN_VOLUME_DOWN,
+            VIZIO_RMC_CMD_LEARN_MUTE,
+            VIZIO_RMC_CMD_WIFI_SETUP,
             VIZIO_RMC_CMD_MAX
         }
 
@@ -221,12 +243,14 @@ namespace ZTCK.Lib.APMeasurementHelper
 
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER, "Power");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_AUX, "AUX");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_COXIAL, "Coxial");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_OPT, "Optical");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HDMI, "HDMI");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_ARC, "HDMIARC");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BT, "BT");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_USB, "USB");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_RESET_ALL, "ResetAll");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_RESET_AUDIO, "ResetAudio");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VOLUME_UP, "VolUp");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VOLUME_DOWN, "VolDown");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_LEFT_CURSOR, "LeftCursor");
@@ -249,6 +273,30 @@ namespace ZTCK.Lib.APMeasurementHelper
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_EQ_MUSIC, "Music");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_EQ_DIRECT, "Direct");
             this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HEIGHT_ON, "HeightOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HEIGHT_OFF, "HeightOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_HEIGHT_VRT, "HeightVrt");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_MUTE, "Mute");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_BT_PAIR, "BTPair");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SURROUND_ON, "SurroundOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SURROUND_OFF, "SurroundOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VOLUME_LEVELER_ON, "VolLvOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VOLUME_LEVELER_OFF, "VolLvOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_INFO, "Info");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_NIGHT_ON, "NightOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_NIGHT_OFF, "NightOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_AV_DELAY_UP, "DelayUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_AV_DELAY_DOWN, "DelayDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_SPEAKER_TEST, "SpkTest");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VZTVRMT_ON, "VztvrmtOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_VZTVRMT_OFF, "VztvrmtOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_ON, "EcoOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_OFF, "EcoOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER_LED_ON, "PwrLedOn");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER_LED_OFF, "PwrLedOff");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_LEARN_VOLUME_UP, "LearnVolUp");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_LEARN_VOLUME_DOWN, "LearnVolDown");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_LEARN_MUTE, "LearnMute");
+            this._cmd.Add(VIZIO_RMC_CMD.VIZIO_RMC_CMD_WIFI_SETUP, "WifiSetup");
         }
 
         public const string ARDUINO_SEND_IR = "SendIR() {";
