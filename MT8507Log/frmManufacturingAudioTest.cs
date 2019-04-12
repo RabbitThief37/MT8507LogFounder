@@ -218,12 +218,16 @@ namespace MT8507Log
 
             if( this._rmc.LoadCommandFromIno(this.txtArduinoSourceFile.Text) == false )
             {
-                this._isArduino = false;
-                DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}", Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
-                return;
+                DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}\n\n기본 명령어로 설정합니다."
+                                      , Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
+
+                this._rmc.LoadCommandDefault();
+            }
+            else
+            {
+                this._appConfigHandler.Save(APP_CONFIG_KEY.arduinoFileName, this.txtArduinoSourceFile.Text);
             }
 
-            this._appConfigHandler.Save(APP_CONFIG_KEY.arduinoFileName, this.txtArduinoSourceFile.Text);
             this._isArduino = true;
         }
 
@@ -426,14 +430,6 @@ namespace MT8507Log
                 if( result == DialogResult.Yes)
                 {
                     BtnOpenArduinoSourceFile_Click(null, null);
-
-                    if (this._rmc.LoadCommandFromIno(this.txtArduinoSourceFile.Text) == false)
-                    {
-                        DisplayErrorMessageBox(string.Format("{0} 내용이 올바르지 않습니다.\n\n{1}\n\n기본 명령어로 설정합니다."
-                                              , Path.GetFileName(this.txtArduinoSourceFile.Text), this._rmc.ErrorMessage));
-
-                        this._rmc.LoadCommandDefault();
-                    }
                 }
                 else
                 {

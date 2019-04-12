@@ -17,6 +17,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             this._receiveQueue = new ConcurrentQueue<byte[]>();
             this._serialClient = new SerialClient(this._receiveQueue);
             this._processQueue = new ConcurrentQueue<string>();
+            this._processSpecialQueue = new ConcurrentQueue<string>();
 
             this._processPortDataThread = new Thread(new ThreadStart(this.ProcessPortDataInQueue))
             {
@@ -29,6 +30,20 @@ namespace ZTCK.Lib.APMeasurementHelper
                 Priority = ThreadPriority.Normal
             };
             this._processStringThread.Name = "ProcessQueue" + this._processStringThread.ManagedThreadId.ToString();
+
+            this._processSpecialStringThread = new Thread(new ThreadStart(ProcessSpecialStringInQueue))
+            {
+                Priority = ThreadPriority.Normal
+            };
+            this._processSpecialStringThread.Name = "ProcessQueue" + this._processStringThread.ManagedThreadId.ToString();
+
+            this.MODULE_VERSION = new string[4]
+            {
+                "{0}.{0}.{0}",
+                "{0}.{0}.{0}",
+                "{0}.{0}.{0}",
+                "{0}.{0}.{0}"
+            };
         }
 
         public void Dispose()
@@ -46,6 +61,11 @@ namespace ZTCK.Lib.APMeasurementHelper
             if (this._processStringThread.ThreadState != ThreadState.Stopped)
             {
                 this._processStringThread.Abort();
+            }
+
+            if (this._processSpecialStringThread.ThreadState != ThreadState.Stopped)
+            {
+                this._processSpecialStringThread.Abort();
             }
         }
 
@@ -65,6 +85,7 @@ namespace ZTCK.Lib.APMeasurementHelper
 
             this._processPortDataThread.Start();
             this._processStringThread.Start();
+            this._processSpecialStringThread.Start();
 
             this.IsOpen = true;
             return true;
@@ -146,7 +167,24 @@ namespace ZTCK.Lib.APMeasurementHelper
                     continue;
                 }
 
-                if (commandLine.Contains(COMMAND_PREFIX) == false)
+                System.Diagnostics.Debug.Print(commandLine + "\r\n");
+
+                if (commandLine.Contains(LOG_ULI_VERSION) == true)
+                {
+                    this._processSpecialQueue.Enqueue(commandLine);
+                    continue;
+                }
+                else if (commandLine.Contains(LOG_MODULE_VERSION) == true)
+                {
+                    this._processSpecialQueue.Enqueue(commandLine);
+                    continue;
+                }
+                else if (commandLine.Contains(LOG_DC_FINAL_OFF) == true)
+                {
+                    this._processSpecialQueue.Enqueue(commandLine);
+                    continue;
+                }
+                else if (commandLine.Contains(COMMAND_PREFIX) == false)
                 {
                     continue;
                 }
@@ -182,12 +220,73 @@ namespace ZTCK.Lib.APMeasurementHelper
                         }
                     }
 
-                    //System.Diagnostics.Debug.Print(result);
-                    //System.Diagnostics.Debug.Print("\r\n");
-
                     UpdateStatus(ref commandID, ref commandArgument, ref commandArgumentList);
-
                 } while (false);
+            }
+        }
+
+        //-------------------------------------//
+        //  SPECIAL STRING QUEUE PROCESS THREAD 
+        //------------------------------------//
+        private void ProcessSpecialStringInQueue()
+        {
+            string commandLine = string.Empty;
+            int pos = 0;
+            int index = 0;
+
+            while (this._processContinue)
+            {
+                if (this._processSpecialQueue.TryDequeue(out commandLine) == false)
+                {
+                    Thread.Sleep(10);
+                    continue;
+                }
+
+                if (commandLine.Contains(LOG_ULI_VERSION) == true)
+                {
+                    //<a_am_str_poweron_init_peripheral_unit>***{36514}***ULI_VERSION{V1.10.16.0},Date{Apr 11 2019},Time{15:13:03}
+                    pos = commandLine.IndexOf(LOG_ULI_VERSION) + LOG_ULI_VERSION.Length;
+                    index = commandLine.IndexOf('{', pos);
+
+                    if( index != -1 )
+                    {
+                        pos = commandLine.IndexOf('}', index + 1);
+                        this.ULI_VERSION = commandLine.Substring(index + 1, pos - index - 1);
+                    }
+                }
+                else if (commandLine.Contains(LOG_MODULE_VERSION) == true)
+                {
+                    //<misc_uart_mcu_process_data_init_sw_version>module{MCU} - {1}.{2}.{7}
+                    pos = commandLine.IndexOf(LOG_MODULE_VERSION) + LOG_MODULE_VERSION.Length;
+                    index = commandLine.IndexOf('-', pos);
+                    if (index == -1)
+                        continue;
+
+                    switch ( commandLine.Substring(pos, 3) )
+                    {
+                        case "MCU":
+                            this.MODULE_VERSION[0] = commandLine.Substring(index + 2).Trim();
+                            break;
+
+                        case "DSP":
+                            this.MODULE_VERSION[1] = commandLine.Substring(index + 2).Trim();
+                            break;
+
+                        case "HDM":
+                            this.MODULE_VERSION[2] = commandLine.Substring(index + 2).Trim();
+                            break;
+
+                        case "eAR":
+                            this.MODULE_VERSION[3] = commandLine.Substring(index + 2).Trim();
+                            this.POWER_DC_FINAL_ON = true;
+                            break;
+                    }
+                }
+                else if (commandLine.Contains(LOG_DC_FINAL_OFF) == true)
+                {
+                    //_mt85xx_uart_suspend end
+                    this.POWER_DC_FINAL_OFF = true;
+                }
             }
         }
 
@@ -203,9 +302,19 @@ namespace ZTCK.Lib.APMeasurementHelper
             {
                 case 0x0001:
                     if (valueArg == 1 || valueArg == 2 || valueArg == 5)
+                    {
                         this.POWER_STATUS = "ON";
+                        this.POWER_DC_FINAL_OFF = false;
+                    }
                     else
+                    {
                         this.POWER_STATUS = "OFF";
+                        this.POWER_DC_FINAL_ON = false;
+                        this.MODULE_VERSION[0] = "{0}.{0}.{0}";
+                        this.MODULE_VERSION[1] = "{0}.{0}.{0}";
+                        this.MODULE_VERSION[2] = "{0}.{0}.{0}";
+                        this.MODULE_VERSION[3] = "{0}.{0}.{0}";
+                    }
                     break;
 
                 case 0x0010: this.VOLUME = valueArg; break;
@@ -421,7 +530,6 @@ namespace ZTCK.Lib.APMeasurementHelper
 
             for (int retryCount = 0; retryCount < this.SetCommandRetryCounter; retryCount++)
             {
-                this.ResetNewData();
                 index = 0;
 
                 do
@@ -458,6 +566,10 @@ namespace ZTCK.Lib.APMeasurementHelper
         public const string COMMAND_DATA = "},Data{";
         public const string COMMAND_DATA_FIRST = "},0{";
 
+        public const string LOG_ULI_VERSION = "<a_am_str_poweron_init_peripheral_unit>***{";
+        public const string LOG_MODULE_VERSION = "<misc_uart_mcu_process_data_init_sw_version>module{";
+        public const string LOG_DC_FINAL_OFF = "<=rtusb_suspend()";
+
         public void ResetNewData() { this.changeData = false; }
 
         private void SetNewData() { this.changeData = true; }
@@ -469,9 +581,11 @@ namespace ZTCK.Lib.APMeasurementHelper
         public string ErrorMessage { get; private set; }
 
         //------------------------------------------------------------------
-        // MTK STATUS FROM LOG
+        // MTK STATUS FROM COMMAND LOG
         //------------------------------------------------------------------
-        public string POWER_STATUS { get; private set; } = "ON";
+        public string POWER_STATUS { get; private set; } = "OFF";
+        public bool POWER_DC_FINAL_OFF { get; private set; } = false;
+        public bool POWER_DC_FINAL_ON { get; private set; } = false;
         public string INPUT_SOURCE { get; private set; } = "AUX";
         public int VOLUME { get; private set; } = 15;
         public int SUBWOOFER_INDEX { get; private set; } = 10;
@@ -518,6 +632,12 @@ namespace ZTCK.Lib.APMeasurementHelper
         public string EQ_STATUS { get; private set; } = "MOVIE";
         public string MODEL_NAME { get; private set; } = "SB46514-F6";
         public string DEMO_MODE { get; private set; } = "OFF";
+
+        //------------------------------------------------------------------
+        // SPECIAL STRING
+        //------------------------------------------------------------------
+        public string ULI_VERSION { get; private set; } = "V0.0.0.0";
+        public string[] MODULE_VERSION { get; private set; }
         //------------------------------------------------------------------
 
         public string _portName;
@@ -529,6 +649,9 @@ namespace ZTCK.Lib.APMeasurementHelper
 
         private ConcurrentQueue<string> _processQueue;
         private Thread _processStringThread;
+
+        private ConcurrentQueue<string> _processSpecialQueue;
+        private Thread _processSpecialStringThread;
 
         private bool changeData = false;
     }
