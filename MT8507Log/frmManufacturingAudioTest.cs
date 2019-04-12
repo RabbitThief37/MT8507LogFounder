@@ -17,6 +17,7 @@ using ZTCK.Lib.APMeasurementHelper;
 
 using static MT8507Log.APxInputChannelInfo;
 using static ZTCK.Lib.APMeasurementHelper.ArduinoRemote;
+using static ZTCK.Lib.APMeasurementHelper.AppConfigHandler;
 
 namespace MT8507Log
 {
@@ -43,7 +44,7 @@ namespace MT8507Log
                 this._rmc = new ArduinoRemote();
                 this._logStatus = new MtkLogStatus();
 
-                this._config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                this._appConfigHandler = new AppConfigHandler();
 
                 this._apx = new APx500();
                 this._excel = new Microsoft.Office.Interop.Excel.Application();
@@ -66,6 +67,15 @@ namespace MT8507Log
             {
                 if( MessageBox.Show(this, "COM PORT가 1개 뿐이 없습니다.\n\n계속 진행하시겠습니까?", "WARNING"
                                     , MessageBoxButtons.YesNo, MessageBoxIcon.Information) != DialogResult.Yes)
+                {
+                    this.Close();
+                    return;
+                }
+            }
+
+            if ( this._appConfigHandler.MakeKeys() == false )
+            {
+                DisplayErrorMessageBox(string.Format("app.config 환경을 구성하는데 실패했습니다.\n\n{0}", this._appConfigHandler.ErrorMessage));
                 this.Close();
                 return;
             }
@@ -80,8 +90,8 @@ namespace MT8507Log
             }
             else
             {
-                string rmcPortName = ConfigurationManager.AppSettings["rmcComPort"];
-                string mtkPortName = ConfigurationManager.AppSettings["mtkComPort"];
+                string rmcPortName = this._appConfigHandler.Get(APP_CONFIG_KEY.rmcComPort);
+                string mtkPortName = this._appConfigHandler.Get(APP_CONFIG_KEY.mtkComPort); 
 
                 this.cboRmcTxSerialPorts.Items.AddRange(portNames);
                 this.cboMtkLogSerialPorts.Items.AddRange(portNames);
@@ -89,7 +99,7 @@ namespace MT8507Log
                 this.cboRmcTxSerialPorts.SelectedIndex = 0;
                 this.cboMtkLogSerialPorts.SelectedIndex = 1;
 
-                if ( rmcPortName.Length > 0 || mtkPortName.Length > 0 )
+                if ( string.IsNullOrEmpty(rmcPortName) == false || string.IsNullOrEmpty(mtkPortName) == false )
                 {
                     for(int i = 0; i < portNames.Length; i++)
                     {
@@ -106,26 +116,15 @@ namespace MT8507Log
                         }
                     }
                 }
-
-                this.cboInputMode.Text = string.Empty;
-                this.cboApxInputChannel.Text = string.Empty;
             }
+
+            this.cboInputMode.Text = string.Empty;
+            this.cboApxInputChannel.Text = string.Empty;
 
             // App.config 안에 있는 내용을 적용한다.
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["arduinoFileName"]))
-            {
-                this.txtArduinoSourceFile.Text = ConfigurationManager.AppSettings["arduinoFileName"];
-            }
-
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["apxFileName"]))
-            {
-                this.txtApxProjectFile.Text = ConfigurationManager.AppSettings["apxFileName"];
-            }
-
-            if (!string.IsNullOrEmpty(ConfigurationManager.AppSettings["excelFileName"]))
-            {
-                this.txtSpecSheetFile.Text = ConfigurationManager.AppSettings["excelFileName"];
-            }
+            this.txtArduinoSourceFile.Text = this._appConfigHandler.Get(APP_CONFIG_KEY.arduinoFileName);
+            this.txtApxProjectFile.Text = this._appConfigHandler.Get(APP_CONFIG_KEY.apxFileName);
+            this.txtSpecSheetFile.Text = this._appConfigHandler.Get(APP_CONFIG_KEY.excelFileName);
         }
 
         // 정상 종료
@@ -167,8 +166,7 @@ namespace MT8507Log
             this.btnConnectRmcTxSerialPort.Text = "DISCONNECT";
             this.cboRmcTxSerialPorts.Enabled = false;
 
-            this._config.AppSettings.Settings["rmcComPort"].Value = this.cboRmcTxSerialPorts.Text;
-            this._config.Save(ConfigurationSaveMode.Modified);
+            this._appConfigHandler.Save(APP_CONFIG_KEY.rmcComPort, this.cboRmcTxSerialPorts.Text);
         }
 
         // MTK log 분석을 위한 클래스 
@@ -192,8 +190,7 @@ namespace MT8507Log
             this.btnConnectMtkSerialPort.Text = "DISCONNECT";
             this.cboMtkLogSerialPorts.Enabled = false;
 
-            this._config.AppSettings.Settings["mtkComPort"].Value = this.cboMtkLogSerialPorts.Text;
-            this._config.Save(ConfigurationSaveMode.Modified);
+            this._appConfigHandler.Save(APP_CONFIG_KEY.mtkComPort, this.cboMtkLogSerialPorts.Text);
         }
 
         // Arduino Source File 선택
@@ -226,9 +223,7 @@ namespace MT8507Log
                 return;
             }
 
-            this._config.AppSettings.Settings["arduinoFileName"].Value = this.txtArduinoSourceFile.Text;
-            this._config.Save(ConfigurationSaveMode.Modified);
-
+            this._appConfigHandler.Save(APP_CONFIG_KEY.arduinoFileName, this.txtArduinoSourceFile.Text);
             this._isArduino = true;
         }
 
@@ -302,8 +297,7 @@ namespace MT8507Log
                 return;
             }
 
-            this._config.AppSettings.Settings["apxFileName"].Value = this.txtApxProjectFile.Text;
-            this._config.Save(ConfigurationSaveMode.Modified);
+            this._appConfigHandler.Save(APP_CONFIG_KEY.apxFileName, this.txtApxProjectFile.Text);
 
             this._apx.Visible = true;
             this.Cursor = Cursors.Default;
@@ -377,8 +371,7 @@ namespace MT8507Log
                 return;
             }
 
-            this._config.AppSettings.Settings["excelFileName"].Value = this.txtSpecSheetFile.Text;
-            this._config.Save(ConfigurationSaveMode.Modified);
+            this._appConfigHandler.Save(APP_CONFIG_KEY.excelFileName, this.txtSpecSheetFile.Text);
 
             this.Activate();
             this._isOpenExcel = true;
@@ -486,7 +479,7 @@ namespace MT8507Log
             }
         }
 
-        private Configuration _config;
+        private AppConfigHandler _appConfigHandler;
 
         public MtkLogStatus _logStatus = null;
         public ArduinoRemote _rmc = null;
