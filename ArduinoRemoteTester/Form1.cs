@@ -49,5 +49,15 @@ namespace ArduinoRemoteTester
         {
             this._rmc.SendCommand("Optical");
         }
+
+        private void Button5_Click(object sender, EventArgs e)
+        {
+            this._rmc.SendCommand("EcoOn");
+        }
+
+        private void Button6_Click(object sender, EventArgs e)
+        {
+            this._rmc.SendCommand("VolUp");
+        }
     }
 }

@@ -53,7 +53,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(35, 36);
+            this.label1.Location = new System.Drawing.Point(13, 36);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(117, 19);
             this.label1.TabIndex = 0;
@@ -62,7 +62,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(35, 75);
+            this.label2.Location = new System.Drawing.Point(13, 75);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(117, 19);
             this.label2.TabIndex = 0;
@@ -71,7 +71,7 @@
             // cboMtkComport
             // 
             this.cboMtkComport.FormattingEnabled = true;
-            this.cboMtkComport.Location = new System.Drawing.Point(159, 34);
+            this.cboMtkComport.Location = new System.Drawing.Point(137, 34);
             this.cboMtkComport.Name = "cboMtkComport";
             this.cboMtkComport.Size = new System.Drawing.Size(136, 27);
             this.cboMtkComport.TabIndex = 1;
@@ -79,7 +79,7 @@
             // cboRmcComport
             // 
             this.cboRmcComport.FormattingEnabled = true;
-            this.cboRmcComport.Location = new System.Drawing.Point(159, 72);
+            this.cboRmcComport.Location = new System.Drawing.Point(137, 72);
             this.cboRmcComport.Name = "cboRmcComport";
             this.cboRmcComport.Size = new System.Drawing.Size(136, 27);
             this.cboRmcComport.TabIndex = 1;
@@ -87,7 +87,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(35, 122);
+            this.label3.Location = new System.Drawing.Point(13, 122);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(144, 19);
             this.label3.TabIndex = 0;
@@ -95,10 +95,10 @@
             // 
             // txtArduinoFileName
             // 
-            this.txtArduinoFileName.Location = new System.Drawing.Point(39, 144);
+            this.txtArduinoFileName.Location = new System.Drawing.Point(17, 144);
             this.txtArduinoFileName.Name = "txtArduinoFileName";
             this.txtArduinoFileName.ReadOnly = true;
-            this.txtArduinoFileName.Size = new System.Drawing.Size(585, 26);
+            this.txtArduinoFileName.Size = new System.Drawing.Size(607, 26);
             this.txtArduinoFileName.TabIndex = 2;
             // 
             // btnSelectArduinoFile
@@ -147,7 +147,7 @@
             // 
             // btnTestStart
             // 
-            this.btnTestStart.Location = new System.Drawing.Point(222, 212);
+            this.btnTestStart.Location = new System.Drawing.Point(200, 212);
             this.btnTestStart.Name = "btnTestStart";
             this.btnTestStart.Size = new System.Drawing.Size(252, 51);
             this.btnTestStart.TabIndex = 5;
@@ -158,17 +158,17 @@
             // txtCurrrentJob
             // 
             this.txtCurrrentJob.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.txtCurrrentJob.Location = new System.Drawing.Point(39, 292);
+            this.txtCurrrentJob.Location = new System.Drawing.Point(17, 292);
             this.txtCurrrentJob.Name = "txtCurrrentJob";
             this.txtCurrrentJob.ReadOnly = true;
-            this.txtCurrrentJob.Size = new System.Drawing.Size(627, 26);
+            this.txtCurrrentJob.Size = new System.Drawing.Size(649, 26);
             this.txtCurrrentJob.TabIndex = 2;
             this.txtCurrrentJob.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(35, 355);
+            this.label6.Location = new System.Drawing.Point(13, 355);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(144, 19);
             this.label6.TabIndex = 0;
@@ -176,7 +176,7 @@
             // 
             // txtSuccessCounter
             // 
-            this.txtSuccessCounter.Location = new System.Drawing.Point(185, 352);
+            this.txtSuccessCounter.Location = new System.Drawing.Point(163, 352);
             this.txtSuccessCounter.Name = "txtSuccessCounter";
             this.txtSuccessCounter.ReadOnly = true;
             this.txtSuccessCounter.Size = new System.Drawing.Size(110, 26);
@@ -203,6 +203,7 @@
             this.txtFailedCounter.TabIndex = 4;
             this.txtFailedCounter.Text = "0";
             this.txtFailedCounter.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.txtFailedCounter.TextChanged += new System.EventHandler(this.TxtFailedCounter_TextChanged);
             // 
             // txtFailedLastTime
             // 
@@ -215,7 +216,7 @@
             // 
             // txtStartTime
             // 
-            this.txtStartTime.Location = new System.Drawing.Point(39, 384);
+            this.txtStartTime.Location = new System.Drawing.Point(17, 384);
             this.txtStartTime.Name = "txtStartTime";
             this.txtStartTime.ReadOnly = true;
             this.txtStartTime.Size = new System.Drawing.Size(256, 26);
@@ -229,7 +230,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(678, 455);
+            this.ClientSize = new System.Drawing.Size(678, 431);
             this.Controls.Add(this.btnTestStart);
             this.Controls.Add(this.txtStartTime);
             this.Controls.Add(this.txtFailedLastTime);

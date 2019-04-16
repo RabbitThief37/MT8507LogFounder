@@ -27,6 +27,9 @@ namespace AutoTestATS_524
         private MtkLogStatus _logStatus = null;
         private ArduinoRemote _rmc = null;
 
+        private Thread _progressTestThread;
+        private bool _progressThreadContinue = false;
+
         public Form1()
         {
             InitializeComponent();
@@ -45,8 +48,15 @@ namespace AutoTestATS_524
             try
             {
                 this._rmc = new ArduinoRemote();
-                this._logStatus = new MtkLogStatus();
+                this._logStatus = new MtkLogStatus(Application.StartupPath);
                 this._appConfigHandler = new AppConfigHandler();
+
+                this._progressThreadContinue = true;
+                this._progressTestThread = new Thread(new ThreadStart(this.ProgressTestThreadFunction))
+                {
+                    Priority = ThreadPriority.Normal
+                };
+                this._progressTestThread.Name = "ProcessQueue" + this._progressTestThread.ManagedThreadId.ToString();
 
                 this._logStatus.SetVerifyStatusCounter = MTK_LOG_CONFIRM_COUNT;
                 this._logStatus.SetCommandRetryCounter = MTK_LOG_RETRY_COUNT;
@@ -126,6 +136,12 @@ namespace AutoTestATS_524
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
+            this._progressThreadContinue = false;
+            if (this._progressTestThread.ThreadState != ThreadState.Stopped)
+            {
+                this._progressTestThread.Abort();
+            }
+
             this._logStatus.Dispose();
             this._rmc.Dispose();
         }
@@ -159,18 +175,24 @@ namespace AutoTestATS_524
         private void BtnTestStart_Click(object sender, EventArgs e)
         //----------------------------------------------------------------------------------------------
         {
-            if( this.btnTestStart.Text == "START")
+            if (this.btnTestStart.Text == "START")
             {
+                this.btnTestStart.Text = "STOP";
+
                 this.txtModelName.Text = string.Empty;
                 this.txtULIVersion.Text = string.Empty;
                 this.txtCurrrentJob.Text = string.Empty;
                 this.txtStartTime.Text = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
 
                 // OPEN MTK
+                this.txtCurrrentJob.Text = "MTK log parser start.";
+                Application.DoEvents();
                 if (MtkLogParserStart() == false)
                     return;
 
                 // OPEN RMC
+                this.txtCurrrentJob.Text = "Vizio RMC arduino start.";
+                Application.DoEvents();
                 if (VizioRmcStart() == false)
                     return;
 
@@ -186,10 +208,14 @@ namespace AutoTestATS_524
                 this.txtULIVersion.Text = this._logStatus.ULI_VERSION;
                 this.txtCurrrentJob.Text = string.Format("MCU:{0},DSP:{1},HDMI:{2},eARC{3}", this._logStatus.MODULE_VERSION[0]
                     , this._logStatus.MODULE_VERSION[1], this._logStatus.MODULE_VERSION[2], this._logStatus.MODULE_VERSION[3]);
-                this.btnTestStart.Text = "STOP";
+
+                this._progressThreadContinue = true;
+                this._progressTestThread.Start();
             }
             else
             {
+                this._progressThreadContinue = false;
+
                 if (this._logStatus.IsOpen)
                 {
                     this._logStatus.Close();
@@ -285,37 +311,55 @@ namespace AutoTestATS_524
         {
             int count = 0;
 
-            if ( this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false )
+            this.txtFailedCounter.Text = "0";
+            this.txtFailedLastTime.Text = string.Empty;
+            this.txtSuccessCounter.Text = "0";
+
+            this.txtCurrrentJob.Text = "READY[1 / 4] - POWER";
+            Application.DoEvents();
+
+            if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
             {
                 DisplayErrorMessageBox(string.Format("Arduino를 통한 POWER 전송에 실패했습니다.\n\n{0}", this._rmc.ErrorMessage));
                 return false;
             }
 
-            if (this._logStatus.CheckMtkStatus(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
+            if (this._logStatus.CheckMtkStatus(ref this._progressThreadContinue) == false)
             {
                 DisplayErrorMessageBox(string.Format("MTK LOG에서 POWER 변경이 없습니다.\n\n{0}", this._logStatus.ErrorMessage));
                 return false;
             }
 
-            if( this._logStatus.POWER_STATUS == "OFF")
+            if (this._logStatus.POWER_STATUS == "OFF")
             {
                 count = 0;
-                while (this._logStatus.POWER_DC_FINAL_OFF == false)
+                while (this._logStatus.POWER_DC_FINAL_OFF == false && this._logStatus.POWER_DC_FAKE_STANDBY_OFF == false)
                 {
                     count++;
                     Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
 
-                    if (count == 100)
+                    if (count == 200)
                         break;
                 }
 
-                if(this._logStatus.POWER_DC_FINAL_OFF == false)
+                this.txtCurrrentJob.Text = "READY[2 / 4] - CHECK POWER OFF";
+                Application.DoEvents();
+
+                if (this._logStatus.POWER_DC_FINAL_OFF == false)
                 {
-                    DisplayErrorMessageBox("DC OFF가 완전하게 되지 않았다. 확인요망!!!");
-                    return false;
+                    if (this._logStatus.POWER_DC_FAKE_STANDBY_OFF == false)
+                    {
+                        DisplayErrorMessageBox("DC OFF가 완전하게 되지 않았다. 확인요망!!!");
+                        return false;
+                    }
+                }
+                else
+                {
+                    Thread.Sleep(2000);
                 }
 
-                Thread.Sleep(2000);
+                this.txtCurrrentJob.Text = "READY[2 / 4] - POWER ON";
+                Application.DoEvents();
 
                 if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
                 {
@@ -323,6 +367,9 @@ namespace AutoTestATS_524
                     return false;
                 }
             }
+
+            this.txtCurrrentJob.Text = "READY[3 / 4] - CHECK POWER ON & VERSION";
+            Application.DoEvents();
 
             count = 0;
             while (this._logStatus.POWER_DC_FINAL_ON == false)
@@ -340,8 +387,259 @@ namespace AutoTestATS_524
                 return false;
             }
 
+            this.txtCurrrentJob.Text = "READY[4 / 4] - ECO MODE ON";
+            Application.DoEvents();
+
+            if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_ON) == false)
+            {
+                DisplayErrorMessageBox(string.Format("Arduino를 통한 POWER 전송에 실패했습니다.\n\n{0}", this._rmc.ErrorMessage));
+                return false;
+            }
+
+            Thread.Sleep(2000); //////////////////////////////////////////////////////////////////////////////////////////
+
+            if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_ON) == false)
+            {
+                DisplayErrorMessageBox(string.Format("Arduino를 통한 POWER 전송에 실패했습니다.\n\n{0}", this._rmc.ErrorMessage));
+                return false;
+            }
+
+            Thread.Sleep(2000); //////////////////////////////////////////////////////////////////////////////////////////
+
             return true;
         }
 
+        //-------------------------------------//
+        // TEST PROCESS THREAD 
+        //------------------------------------//
+        private void ProgressTestThreadFunction()
+        {
+            VIZIO_RMC_CMD ecomode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_OFF;
+            int count = 0;
+            int countFailed = 0;
+            int countSuccess = 0;
+
+            while ( this._progressThreadContinue )
+            {
+                if (ecomode == VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_ON)
+                {
+                    ecomode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_OFF;
+                    UpdateCurrentJobTextbox("( 1 / 5 ) ECO MODE OFF");
+                }
+                else
+                {
+                    ecomode = VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_ON;
+                    UpdateCurrentJobTextbox("( 1 / 5 ) ECO MODE ON");
+                }
+
+                if (this._rmc.SendCommand(ecomode) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._rmc.ErrorMessage);
+                    break;
+                }
+
+                count = 0;
+                while (this._progressThreadContinue == true)
+                {
+                    count++;
+                    Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                    if (count == 20)
+                        break;
+                }
+
+                if (this._progressThreadContinue == false)
+                    break;
+
+                if (this._rmc.SendCommand(ecomode) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._rmc.ErrorMessage);
+                    break;
+                }
+
+                if (this._logStatus.CheckMtkStatus(ref this._progressThreadContinue) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._logStatus.ErrorMessage);
+                    break;
+                }
+
+                // DC OFF
+                UpdateCurrentJobTextbox("( 2 / 5 ) DC OFF");
+                if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._rmc.ErrorMessage);
+                    break;
+                }
+
+                if (this._logStatus.CheckMtkStatus(ref this._progressThreadContinue) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._logStatus.ErrorMessage);
+                    break;
+                }
+
+                // DC ON
+                if( ecomode == VIZIO_RMC_CMD.VIZIO_RMC_CMD_ECO_OFF )
+                {
+                    UpdateCurrentJobTextbox("( 3 / 5 ) CHECK FAKE STANDBY");
+                    count = 0;
+                    while (this._logStatus.POWER_DC_FAKE_STANDBY_OFF == false && this._progressThreadContinue == true)
+                    {
+                        count++;
+                        Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                        if (count == 100)
+                            break;
+                    }
+
+                    if (this._progressThreadContinue == false)
+                        break;
+
+                    if (this._logStatus.POWER_DC_FAKE_STANDBY_OFF == false)
+                    {
+                        UpdateCurrentJobTextbox("ERR - FAKE STANDBY가 완전하게 되지 않았다. 확인요망!!!");
+                        break;
+                    }
+                }
+                else
+                {
+                    UpdateCurrentJobTextbox("( 3 / 5 ) CHECK DC OFF");
+                    count = 0;
+                    while (this._logStatus.POWER_DC_FINAL_OFF == false && this._progressThreadContinue == true)
+                    {
+                        count++;
+                        Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                        if (count == 300)
+                            break;
+                    }
+                    if (this._progressThreadContinue == false)
+                        break;
+
+                    count = 0;
+                    while (this._progressThreadContinue == true)
+                    {
+                        count++;
+                        Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                        if (count == 30)
+                            break;
+                    }
+                    if (this._progressThreadContinue == false)
+                        break;
+
+                    if (this._logStatus.POWER_DC_FINAL_OFF == false)
+                    {
+                        UpdateCurrentJobTextbox("ERR - DC OFF가 완전하게 되지 않았다. 확인요망!!!");
+                        break;
+                    }
+                }
+
+                UpdateCurrentJobTextbox("( 4 / 5 ) DC ON");
+                if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._rmc.ErrorMessage);
+                    break;
+                }
+
+                if (this._logStatus.CheckMtkStatus(ref this._progressThreadContinue) == false)
+                {
+                    UpdateCurrentJobTextbox("ERR-" + this._logStatus.ErrorMessage);
+                    break;
+                }
+
+                UpdateCurrentJobTextbox("( 5 / 5 ) CHECK DC ON & VERSION");
+
+                count = 0;
+                while (this._logStatus.POWER_DC_FINAL_ON == false)
+                {
+                    count++;
+                    Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                    if (count == 300)
+                        break;
+                }
+
+                if (this._logStatus.POWER_DC_FINAL_ON == false)
+                {
+                    UpdateCurrentJobTextbox("DC ON가 완전하게 되지 않았다. VERSION이 없다.");
+                    break;
+                }
+
+                // VERSION 확인
+                if (    this._logStatus.MODULE_VERSION[0] == "{0}.{0}.{0}" 
+                    || this._logStatus.MODULE_VERSION[1] == "{0}.{0}.{0}" 
+                    || this._logStatus.MODULE_VERSION[2] == "{0}.{0}.{0}"
+                    || this._logStatus.MODULE_VERSION[3] == "{0}.{0}.{0}" )
+                {
+                    countFailed++;
+                    UpdateFailedCounterTextbox(countFailed.ToString());
+
+                    if(this._logStatus.MODULE_VERSION[0] == "{0}.{0}.{0}")
+                        UpdateCurrentJobTextbox("ERROR - MCU VERSION {0}.{0}.{0}");
+                    else if (this._logStatus.MODULE_VERSION[1] == "{0}.{0}.{0}")
+                        UpdateCurrentJobTextbox("ERROR - DSP VERSION {0}.{0}.{0}");
+                    else if (this._logStatus.MODULE_VERSION[2] == "{0}.{0}.{0}")
+                        UpdateCurrentJobTextbox("ERROR - HDMI VERSION {0}.{0}.{0}");
+                    else if (this._logStatus.MODULE_VERSION[3] == "{0}.{0}.{0}")
+                        UpdateCurrentJobTextbox("ERROR - eARC VERSION {0}.{0}.{0}");
+
+                    count = 0;
+                    while (this._progressThreadContinue == true)
+                    {
+                        count++;
+                        Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                        if( count == 300)
+                            UpdateCurrentJobTextbox("WAIT FOR F/W UPGRADE DONW");
+
+                        if (count == 3600)
+                            break;
+                    }
+                    if (this._progressThreadContinue == false)
+                        break;
+                }
+                else
+                {
+                    countSuccess++;
+                    UpdateSuccessCounterTextbox(countSuccess.ToString());
+                }
+            }
+        }
+
+        public void UpdateCurrentJobTextbox(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(UpdateCurrentJobTextbox), new object[] { value });
+                return;
+            }
+
+            this.txtCurrrentJob.Text = value;
+        }
+        public void UpdateFailedCounterTextbox(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(UpdateFailedCounterTextbox), new object[] { value });
+                return;
+            }
+
+            this.txtFailedCounter.Text = value;
+        }
+        public void UpdateSuccessCounterTextbox(string value)
+        {
+            if (InvokeRequired)
+            {
+                this.Invoke(new Action<string>(UpdateSuccessCounterTextbox), new object[] { value });
+                return;
+            }
+
+            this.txtSuccessCounter.Text = value;
+        }
+
+        private void TxtFailedCounter_TextChanged(object sender, EventArgs e)
+        {
+            this.txtFailedLastTime.Text = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+        }
     }
 }
