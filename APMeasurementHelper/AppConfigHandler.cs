@@ -96,7 +96,10 @@ namespace ZTCK.Lib.APMeasurementHelper
                     this._config.AppSettings.Settings["arduinoFileName"].Value = value;
                     break;
             }
+        }
 
+        public void SaveToConfig()
+        {
             this._config.Save(ConfigurationSaveMode.Modified);
         }
 

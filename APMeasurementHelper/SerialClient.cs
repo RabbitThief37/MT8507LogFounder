@@ -125,9 +125,11 @@ namespace ZTCK.Lib.APMeasurementHelper
         //---------------------------------//
         private void SerialReceiving()
         {
-            while (true)
+            int count = 0;
+
+            while (ModeratorForTest._threadContinue == true)
             {
-                int count = _serialPort.BytesToRead;
+                count = _serialPort.BytesToRead;
 
                 if (count < 1)
                 {

@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="AppConfigHandler.cs" />
     <Compile Include="ArduinoRemote.cs" />
+    <Compile Include="ModeratorForTest.cs" />
     <Compile Include="SerialClient.cs" />
     <Compile Include="MtkLogStatus.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -15,7 +15,7 @@ namespace ZTCK.Lib.APMeasurementHelper
     {
         public static readonly log4net.ILog logger = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public MtkLogStatus(string path)
+        public MtkLogStatus()
         {
             this._receiveQueue = new ConcurrentQueue<byte[]>();
             this._serialClient = new SerialClient(this._receiveQueue);
@@ -47,18 +47,6 @@ namespace ZTCK.Lib.APMeasurementHelper
                 "{0}.{0}.{0}",
                 "{0}.{0}.{0}"
             };
-
-            if (!log4net.LogManager.GetRepository().Configured)
-            {
-                var configFile = new FileInfo(path + "\\APMeasurementHelper.dll.config");
-
-                if (!configFile.Exists)
-                {
-                    throw new FileLoadException(String.Format("The configuration file {0} does not exist", configFile));
-                }
-
-                log4net.Config.XmlConfigurator.Configure(configFile);
-            }
         }
 
         public void Dispose()
@@ -86,6 +74,18 @@ namespace ZTCK.Lib.APMeasurementHelper
 
         public bool Start(string portName = "")
         {
+            if (!log4net.LogManager.GetRepository().Configured)
+            {
+                var configFile = new FileInfo(this.ConfigPath + "\\APMeasurementHelper.dll.config");
+
+                if (!configFile.Exists)
+                {
+                    throw new FileLoadException(String.Format("The configuration file {0} does not exist", configFile));
+                }
+
+                log4net.Config.XmlConfigurator.Configure(configFile);
+            }
+
             if (portName.Length >= 0)
                 this._portName = portName;
 
@@ -95,8 +95,6 @@ namespace ZTCK.Lib.APMeasurementHelper
                 this.IsOpen = false;
                 return false;
             }
-
-            this._processContinue = true;
 
             this._processPortDataThread.Start();
             this._processStringThread.Start();
@@ -108,7 +106,6 @@ namespace ZTCK.Lib.APMeasurementHelper
 
         public void Close()
         {
-            this._processContinue = false;
             this._serialClient.CloseConn();
             this.IsOpen = false;
         }
@@ -125,7 +122,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             accData = new StringBuilder(4096);
             isCommand = false;
 
-            while (this._processContinue)
+            while (ModeratorForTest._threadContinue == true)
             {
                 if (this._receiveQueue.TryDequeue(out portData) == false)
                 {
@@ -174,7 +171,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             string commandArgumentList = string.Empty;
             int pos = 0;
 
-            while (this._processContinue)
+            while (ModeratorForTest._threadContinue == true)
             {
                 if (this._processQueue.TryDequeue(out commandLine) == false)
                 {
@@ -255,7 +252,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             int pos = 0;
             int index = 0;
 
-            while (this._processContinue)
+            while (ModeratorForTest._threadContinue == true)
             {
                 if (this._processSpecialQueue.TryDequeue(out commandLine) == false)
                 {
@@ -343,6 +340,7 @@ namespace ZTCK.Lib.APMeasurementHelper
                         this.POWER_STATUS = "ON";
                         this.POWER_DC_FINAL_OFF = false;
                         this.POWER_DC_FAKE_STANDBY_OFF = false;
+                        this.RESET_ALL = false;
                     }
                     else
                     {
@@ -381,6 +379,8 @@ namespace ZTCK.Lib.APMeasurementHelper
 
                 case 0x0020:
                     {
+                        this.AUTO_DETECTION = "OFF";
+
                         switch (valueArg)
                         {
                             case 1: this.INPUT_SOURCE = "AUX"; break;
@@ -391,6 +391,21 @@ namespace ZTCK.Lib.APMeasurementHelper
                             case 6: this.INPUT_SOURCE = "BLUETOOTH"; break;
                             case 7: this.INPUT_SOURCE = "USB"; break;
                             case 8: this.INPUT_SOURCE = "CAST"; break;
+                        }
+                    }
+                    break;
+
+                case 0x0021:
+                    {
+                        this.AUTO_DETECTION = "ON";
+
+                        switch (valueArg)
+                        {
+                            case 1: this.INPUT_SOURCE = "AUX"; break;
+                            case 2: this.INPUT_SOURCE = "COAXIAL"; break;
+                            case 3: this.INPUT_SOURCE = "OPTICAL"; break;
+                            case 4: this.INPUT_SOURCE = "HDMI"; break;
+                            case 5: this.INPUT_SOURCE = "ARC"; break;
                         }
                     }
                     break;
@@ -434,6 +449,12 @@ namespace ZTCK.Lib.APMeasurementHelper
                             index++;
 
                         } while (bracePos != -1);
+                    }
+                    break;
+
+                case 0x0090:
+                    {
+                        this.RESET_ALL = true;
                     }
                     break;
 
@@ -561,12 +582,12 @@ namespace ZTCK.Lib.APMeasurementHelper
             return false;
         }
 
-        public bool CheckMtkStatus(ref bool threadContinue)
+        public bool CheckMtkStatus()
         {
             int index = 0;
             bool result = false;
 
-            for (int retryCount = 0; retryCount < this.SetCommandRetryCounter && threadContinue == true; retryCount++)
+            for (int retryCount = 0; retryCount < this.SetCommandRetryCounter && ModeratorForTest._threadContinue == true; retryCount++)
             {
                 index = 0;
 
@@ -581,7 +602,7 @@ namespace ZTCK.Lib.APMeasurementHelper
                     index++;
                     Thread.Sleep(RMC_COMMAND_WAIT_TIME_MS);
 
-                } while (index < SetVerifyStatusCounter && threadContinue == true);
+                } while (index < SetVerifyStatusCounter && ModeratorForTest._threadContinue == true);
 
                 if (result)
                     break;
@@ -606,7 +627,7 @@ namespace ZTCK.Lib.APMeasurementHelper
 
         public const string LOG_ULI_VERSION = "<a_am_str_poweron_init_peripheral_unit>***{";
         public const string LOG_MODULE_VERSION = "<misc_uart_mcu_process_data_init_sw_version>module{";
-        public const string LOG_DC_FINAL_OFF = "<=rtusb_suspend()";
+        public const string LOG_DC_FINAL_OFF = "<IDS> Destroy";
         public const string LOG_FAKE_STANDBY = "enter fake standby, enable bluetooth connectable.";
 
         public void ResetNewData() { this.changeData = false; }
@@ -617,7 +638,8 @@ namespace ZTCK.Lib.APMeasurementHelper
         public int SetCommandRetryCounter { get; set; } = MTK_LOG_RETRY_COUNT;
         public int SetVerifyStatusCounter { get; set; } = MTK_LOG_CONFIRM_COUNT;
 
-        public string ErrorMessage { get; private set; }
+        public string ErrorMessage { get; private set; } = string.Empty;
+        public string ConfigPath { get; set; } = string.Empty;
 
         //------------------------------------------------------------------
         // MTK STATUS FROM COMMAND LOG
@@ -670,8 +692,10 @@ namespace ZTCK.Lib.APMeasurementHelper
         public string VOLUME_LEVELER_STATUS { get; private set; } = "OFF";
         public string NIGHT_MODE_STATUS { get; private set; } = "OFF";
         public string EQ_STATUS { get; private set; } = "MOVIE";
+        public bool RESET_ALL { get; private set; } = false;
         public string MODEL_NAME { get; private set; } = "SB46514-F6";
         public string DEMO_MODE { get; private set; } = "OFF";
+        public string AUTO_DETECTION { get; private set; } = "OFF";
 
         //------------------------------------------------------------------
         // SPECIAL STRING
@@ -685,7 +709,6 @@ namespace ZTCK.Lib.APMeasurementHelper
 
         public ConcurrentQueue<byte[]> _receiveQueue;
         private Thread _processPortDataThread;
-        private bool _processContinue;
 
         private ConcurrentQueue<string> _processQueue;
         private Thread _processStringThread;
