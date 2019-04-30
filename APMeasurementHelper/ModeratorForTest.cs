@@ -98,7 +98,7 @@ namespace ZTCK.Lib.APMeasurementHelper
         }
         public void Dispose()
         {
-            if( _threadContinue == true )
+            if (_threadContinue == true)
                 Close();
         }
         public void Close()
@@ -131,7 +131,7 @@ namespace ZTCK.Lib.APMeasurementHelper
 
             do
             {
-                if( this._initalError == true )
+                if (this._initalError == true)
                     break;
 
                 if (CheckPresetString() == false)
@@ -156,7 +156,9 @@ namespace ZTCK.Lib.APMeasurementHelper
                 if (ReadyForTest() == false)
                     break;
 
-                //this._progressTestThread.Start();
+                // Start TEST
+                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "Running TEST");
+                this._progressTestThread.Start();
 
                 isResult = true;
             } while (false);
@@ -215,7 +217,7 @@ namespace ZTCK.Lib.APMeasurementHelper
 
             if (this._logStatus.Start(this.MtkComPortName) == false)
             {
-                _updateMessage( UPDATE_TEXTBOX.CURRENT_JOB, string.Format("{1}에 연결을 실패하였습니다.{0}", this.MtkComPortName, this._logStatus.ErrorMessage));
+                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("{1}에 연결을 실패하였습니다.{0}", this.MtkComPortName, this._logStatus.ErrorMessage));
                 return false;
             }
 
@@ -247,7 +249,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             }
             else
             {
-                if(this._rmc.LoadCommandFromIno(this.ArduinoFileName) == false)
+                if (this._rmc.LoadCommandFromIno(this.ArduinoFileName) == false)
                     this._rmc.LoadCommandDefault();
             }
         }
@@ -262,17 +264,82 @@ namespace ZTCK.Lib.APMeasurementHelper
 
             do
             {
-                // power off 되었을때는 고려 해야 한다...젠장...다시 넣어~~~~~
+                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[1 / 5] - POWER STATUS");
+                if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
+                {
+                    _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("Arduino를 통한 POWER 전송에 실패했습니다.{0}", this._rmc.ErrorMessage));
+                    break;
+                }
 
-                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[1 / 5] - FACTORY RESET");
+                if (this._logStatus.CheckMtkStatus() == false)
+                {
+                    _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("MTK LOG에서 POWER 변경이 없습니다.{0}", this._logStatus.ErrorMessage));
+                    break;
+                }
+
+                if (this._logStatus.POWER_STATUS == "OFF")
+                {
+                    while (this._logStatus.POWER_DC_FINAL_OFF == false && this._logStatus.POWER_DC_FAKE_STANDBY_OFF == false)
+                    {
+                        count++;
+                        Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                        if (count == 3000)
+                            break;
+                    }
+
+                    if (this._logStatus.POWER_DC_FINAL_OFF == false)
+                    {
+                        if (this._logStatus.POWER_DC_FAKE_STANDBY_OFF == false)
+                        {
+                            _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "DC OFF가 완전하게 되지 않았다. 확인요망!!!");
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        Thread.Sleep(2000);
+                    }
+
+                    _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[1 / 5] - POWER ON");
+                    if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
+                    {
+                        _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("Arduino를 통한 POWER 전송에 실패했습니다.{0}", this._rmc.ErrorMessage));
+                        break;
+                    }
+
+                    if (this._logStatus.CheckMtkStatus() == false)
+                    {
+                        _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("MTK LOG에서 POWER 변경이 없습니다.{0}", this._logStatus.ErrorMessage));
+                        break;
+                    }
+                }
+
+                count = 0;
+                while (this._logStatus.POWER_DC_FINAL_ON == false)
+                {
+                    count++;
+                    Thread.Sleep(100); //////////////////////////////////////////////////////////////////////////////////////////
+
+                    if (count == 3000)
+                        break;
+                }
+
+                if (this._logStatus.POWER_DC_FINAL_ON == false)
+                {
+                    _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "DC ON가 완전하게 되지 않았다. VERSION이 없다.");
+                    break;
+                }
+
+                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[2 / 5] - FACTORY RESET");
                 if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_RESET_ALL) == false)
                 {
-                    _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("Arduino를 통한 FACTORY-RESET 전송에 실패했습니다.\n\n{0}", this._rmc.ErrorMessage));
+                    _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("Arduino를 통한 FACTORY-RESET 전송에 실패했습니다.{0}", this._rmc.ErrorMessage));
                     break;
                 }
 
                 count = 0;
-                while( this._logStatus.RESET_ALL == false || this._logStatus.POWER_DC_FINAL_OFF == false )
+                while (this._logStatus.RESET_ALL == false || this._logStatus.POWER_DC_FINAL_OFF == false)
                 {
                     count++;
                     Thread.Sleep(100);
@@ -289,14 +356,14 @@ namespace ZTCK.Lib.APMeasurementHelper
 
                 Thread.Sleep(2000);
 
-                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[2 / 5] - POWER ON");
+                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[3 / 5] - POWER ON");
                 if (this._rmc.SendCommand(VIZIO_RMC_CMD.VIZIO_RMC_CMD_POWER) == false)
                 {
                     _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, string.Format("Arduino를 통한 POWER 전송에 실패했습니다.\n\n{0}", this._rmc.ErrorMessage));
                     break;
                 }
 
-                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[3 / 5] - AUTO DETECTION");
+                _updateMessage(UPDATE_TEXTBOX.CURRENT_JOB, "READY[4 / 5] - AUTO DETECTION");
 
                 count = 0;
                 while (this._logStatus.AUTO_DETECTION == "OFF")
@@ -372,12 +439,12 @@ namespace ZTCK.Lib.APMeasurementHelper
         /// <summary>
         /// Script를 수행하는 실제적인 Thread Function
         /// </summary>
-        private void ProgressTestThreadFunction()
-        {
-            //while (_threadContinue)
-            //{
-            //}
-        }
+        public void ProgressTestThreadFunction()
+        {   
+            while( _threadContinue )
+            {
 
+            }
+        }
     }
 }

@@ -167,8 +167,10 @@ namespace AutoTestATS_524
                 this.txtFailedLastTime.Text = string.Empty;
                 this.txtSuccessCounter.Text = "0";
 
+                Cursor.Current = Cursors.WaitCursor;
                 if (this._moderator.Start() == true)
                 {
+                    Cursor.Current = Cursors.Default;
                     this.txtModelName.Text = this._moderator.ModelName;
                     this.txtULIVersion.Text = this._moderator.ULIVersion;
                     this.txtCurrrentJob.Text = string.Format("MCU:{0},DSP:{1},HDMI:{2},eARC{3}", this._moderator.MCUVersion
@@ -177,6 +179,7 @@ namespace AutoTestATS_524
                 }
                 else
                 {
+                    Cursor.Current = Cursors.Default;
                     DisplayErrorMessageBox(this._moderator.ErrorMessage);
                 }
             }

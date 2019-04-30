@@ -575,7 +575,7 @@ namespace ZTCK.Lib.APMeasurementHelper
         {
             if (this.changeData)
             {
-                this.changeData = false;
+                ResetNewData();
                 return true;
             }
 
@@ -587,7 +587,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             int index = 0;
             bool result = false;
 
-            for (int retryCount = 0; retryCount < this.SetCommandRetryCounter && ModeratorForTest._threadContinue == true; retryCount++)
+            for (int retryCount = 0; retryCount < MTK_LOG_RETRY_COUNT && ModeratorForTest._threadContinue == true; retryCount++)
             {
                 index = 0;
 
@@ -602,7 +602,7 @@ namespace ZTCK.Lib.APMeasurementHelper
                     index++;
                     Thread.Sleep(RMC_COMMAND_WAIT_TIME_MS);
 
-                } while (index < SetVerifyStatusCounter && ModeratorForTest._threadContinue == true);
+                } while (index < MTK_LOG_CONFIRM_COUNT && ModeratorForTest._threadContinue == true);
 
                 if (result)
                     break;
@@ -616,7 +616,7 @@ namespace ZTCK.Lib.APMeasurementHelper
             return result;
         }
 
-        public const int MTK_LOG_CONFIRM_COUNT = 20;
+        public const int MTK_LOG_CONFIRM_COUNT = 1000;
         public const int MTK_LOG_RETRY_COUNT = 3;
         public const int RMC_COMMAND_WAIT_TIME_MS = 100;
 
@@ -635,9 +635,6 @@ namespace ZTCK.Lib.APMeasurementHelper
         private void SetNewData() { this.changeData = true; }
 
         public bool IsOpen { get; private set; } = false;
-        public int SetCommandRetryCounter { get; set; } = MTK_LOG_RETRY_COUNT;
-        public int SetVerifyStatusCounter { get; set; } = MTK_LOG_CONFIRM_COUNT;
-
         public string ErrorMessage { get; private set; } = string.Empty;
         public string ConfigPath { get; set; } = string.Empty;
 
